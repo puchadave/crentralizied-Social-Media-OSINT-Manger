@@ -109,10 +109,10 @@ Dieses Repository enthält einen lauffähigen, dockerisierten Einstieg mit zwei 
 Falls `docker compose` auf deinem System mit einer Fehlermeldung abbricht (z. B. weil das Compose-Plugin fehlt oder der Daemon nicht läuft), hilft der folgende Check:
 
 ```bash
-./scripts/verify-docker-env.sh
+./verify-docker-env.sh
 ```
 
-Das Skript prüft, ob Docker-CLI, Daemon und Compose (v2 oder v1) korrekt installiert sind und gibt konkrete Hinweise zur Fehlerbehebung. In restriktiven Umgebungen (z. B. Sandboxen oder CI ohne Daemon) beendet es sich trotzdem mit Exit-Code `0`, damit dein Setup nicht gestoppt wird; verwende optional `./scripts/verify-docker-env.sh --strict`, wenn fehlende Komponenten einen Fehler provozieren sollen.
+Das Skript prüft, ob Docker-CLI, Daemon und Compose (v2 oder v1) korrekt installiert sind und gibt konkrete Hinweise zur Fehlerbehebung. In restriktiven Umgebungen (z. B. Sandboxen oder CI ohne Daemon) beendet es sich trotzdem mit Exit-Code `0`, damit dein Setup nicht gestoppt wird; verwende optional `./verify-docker-env.sh --strict`, wenn fehlende Komponenten einen Fehler provozieren sollen.
 
 Auf Debian/Ubuntu-Systemen installiert man das Compose-Plugin beispielsweise mit:
 
