@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_appointment_root" name="Appointments" sequence="10"/>
+
+    <record id="action_appointment_service" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">appointment.service</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create appointment services to expose on the website and for internal scheduling.
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_appointment_service" name="Services" parent="menu_appointment_root" action="action_appointment_service" sequence="10"/>
+
+    <record id="action_appointment_slot" model="ir.actions.act_window">
+        <field name="name">Slots</field>
+        <field name="res_model">appointment.slot</field>
+        <field name="view_mode">calendar,tree,form</field>
+    </record>
+    <menuitem id="menu_appointment_slot" name="Slots" parent="menu_appointment_root" action="action_appointment_slot" sequence="20"/>
+
+    <record id="action_appointment_booking" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">appointment.booking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_state": "pending"}</field>
+    </record>
+    <menuitem id="menu_appointment_booking" name="Bookings" parent="menu_appointment_root" action="action_appointment_booking" sequence="30"/>
+</odoo>
