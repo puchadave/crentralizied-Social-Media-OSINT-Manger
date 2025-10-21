@@ -11,6 +11,8 @@ Dieses Projekt stellt den Grundstein für eine Plattform bereit, die automatisie
 
 ## Erste Schritte
 
+### Lokale Entwicklung (ohne Container)
+
 1. Abhängigkeiten installieren (empfohlen in einer virtuellen Umgebung):
 
    ```bash
@@ -24,6 +26,32 @@ Dieses Projekt stellt den Grundstein für eine Plattform bereit, die automatisie
    ```
 
 3. Die OpenAPI-Dokumentation ist anschließend unter `http://127.0.0.1:8000/docs` verfügbar.
+
+### Betrieb mit Docker & Docker Compose
+
+1. Optional einen `.env`-File anlegen, um z. B. den OpenAI-Key für den Container bereitzustellen:
+
+   ```bash
+   cat <<'ENV' > .env
+   OPENAI_API_KEY=dein-openai-key
+   OPENAI_API_BASE=https://api.openai.com/v1
+   OPENAI_MODEL=gpt-4o-mini
+   ENV
+   ```
+
+2. Container bauen und starten:
+
+   ```bash
+   docker compose up --build
+   ```
+
+   Der FastAPI-Dienst ist danach unter `http://localhost:8000` erreichbar.
+
+3. Container stoppen:
+
+   ```bash
+   docker compose down
+   ```
 
 ### OpenAI-Integration
 
