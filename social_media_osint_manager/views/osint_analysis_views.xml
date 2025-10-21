@@ -1,0 +1,111 @@
+<odoo>
+    <data>
+        <record id="view_social_media_osint_tree" model="ir.ui.view">
+            <field name="name">social.media.osint.tree</field>
+            <field name="model">social.media.osint</field>
+            <field name="arch" type="xml">
+                <tree string="OSINT Snapshots">
+                    <field name="snapshot_at"/>
+                    <field name="account_id"/>
+                    <field name="post_id"/>
+                    <field name="likes_count"/>
+                    <field name="comments_count"/>
+                    <field name="shares_count"/>
+                    <field name="sentiment_score"/>
+                    <field name="reach"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_social_media_osint_form" model="ir.ui.view">
+            <field name="name">social.media.osint.form</field>
+            <field name="model">social.media.osint</field>
+            <field name="arch" type="xml">
+                <form string="OSINT Snapshot">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="snapshot_at"/>
+                                <field name="account_id"/>
+                                <field name="post_id"/>
+                            </group>
+                            <group>
+                                <field name="likes_count"/>
+                                <field name="comments_count"/>
+                                <field name="shares_count"/>
+                                <field name="reach"/>
+                                <field name="sentiment_score"/>
+                                <field name="mentions_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Topic Breakdown">
+                                <field name="topic_breakdown_json" widget="text" readonly="1"/>
+                            </page>
+                            <page string="Repost Network">
+                                <field name="repost_graph_json" widget="text" readonly="1"/>
+                            </page>
+                            <page string="Location Heatmap">
+                                <field name="location_heatmap_json" widget="text" readonly="1"/>
+                            </page>
+                            <page string="Metadata">
+                                <field name="metadata_json" widget="text" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_social_media_osint_graph" model="ir.ui.view">
+            <field name="name">social.media.osint.graph</field>
+            <field name="model">social.media.osint</field>
+            <field name="arch" type="xml">
+                <graph string="OSINT Metrics" type="line">
+                    <field name="snapshot_at" type="row" interval="day"/>
+                    <field name="likes_count" type="measure"/>
+                    <field name="comments_count" type="measure"/>
+                    <field name="shares_count" type="measure"/>
+                    <field name="sentiment_score" type="measure"/>
+                    <field name="reach" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_social_media_osint_pivot" model="ir.ui.view">
+            <field name="name">social.media.osint.pivot</field>
+            <field name="model">social.media.osint</field>
+            <field name="arch" type="xml">
+                <pivot string="OSINT Breakdown">
+                    <field name="account_id" type="row"/>
+                    <field name="post_id" type="row"/>
+                    <field name="sentiment_score" type="measure"/>
+                    <field name="reach" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="view_social_media_osint_search" model="ir.ui.view">
+            <field name="name">social.media.osint.search</field>
+            <field name="model">social.media.osint</field>
+            <field name="arch" type="xml">
+                <search string="Search OSINT">
+                    <field name="account_id"/>
+                    <field name="post_id"/>
+                    <filter string="Last 7 days" name="last_week" domain="[('snapshot_at', '&gt;=', (context_today() - relativedelta(days=7)))]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Account" name="group_account" context="{'group_by': 'account_id'}"/>
+                        <filter string="Post" name="group_post" context="{'group_by': 'post_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_social_media_osint_analysis" model="ir.actions.act_window">
+            <field name="name">OSINT Snapshots</field>
+            <field name="res_model">social.media.osint</field>
+            <field name="view_mode">tree,graph,pivot,form</field>
+            <field name="search_view_id" ref="view_social_media_osint_search"/>
+        </record>
+    </data>
+</odoo>
