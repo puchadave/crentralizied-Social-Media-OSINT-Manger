@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <menuitem id="menu_social_media_root" name="Social Intelligence" parent="base.menu_marketing" sequence="10"/>
+
+        <menuitem id="menu_social_media_dashboard" name="Dashboard" parent="menu_social_media_root" action="action_social_media_dashboard" sequence="1"/>
+        <menuitem id="menu_social_media_accounts" name="Accounts" parent="menu_social_media_root" action="action_social_media_accounts" sequence="5"/>
+        <menuitem id="menu_social_media_posts" name="Posts" parent="menu_social_media_root" action="action_social_media_posts" sequence="10"/>
+        <menuitem id="menu_social_media_newsletters" name="Newsletters" parent="menu_social_media_root" action="action_social_media_newsletters" sequence="20"/>
+        <menuitem id="menu_social_media_osint" name="OSINT Snapshots" parent="menu_social_media_root" action="action_social_media_osint_analysis" sequence="30"/>
+
+        <record id="action_social_media_ai_settings" model="ir.actions.act_window">
+            <field name="name">AI Settings</field>
+            <field name="res_model">social.media.ai.settings</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="res_config_settings_view_form_social_media"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_social_media_settings" name="AI Settings" parent="menu_social_media_root" action="action_social_media_ai_settings" sequence="40" groups="base.group_system"/>
+
+    </data>
+</odoo>

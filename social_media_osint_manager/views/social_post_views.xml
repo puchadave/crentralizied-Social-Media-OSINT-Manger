@@ -1,0 +1,233 @@
+<odoo>
+    <data>
+        <record id="view_social_media_post_tree" model="ir.ui.view">
+            <field name="name">social.media.post.tree</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <tree string="Social Posts" decoration-success="state == 'published'" decoration-warning="state == 'scheduled'">
+                    <field name="name"/>
+                    <field name="account_id"/>
+                    <field name="state"/>
+                    <field name="scheduled_date"/>
+                    <field name="published_date"/>
+                    <field name="engagement_score"/>
+                    <field name="sentiment_score"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_social_media_post_kanban" model="ir.ui.view">
+            <field name="name">social.media.post.kanban</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_dashboard">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click o_kanban_card_state_{{ record.state.raw_value }}">
+                                <strong><field name="name"/></strong>
+                                <div class="o_kanban_tags">
+                                    <field name="account_id"/>
+                                    <field name="state" widget="badge"/>
+                                </div>
+                                <div class="mt16">
+                                    <field name="scheduled_date"/>
+                                    <field name="published_date"/>
+                                </div>
+                                <div class="o_kanban_metrics">
+                                    <span class="o_stat_text">❤ <field name="likes_count"/></span>
+                                    <span class="o_stat_text">💬 <field name="comments_count"/></span>
+                                    <span class="o_stat_text">🔁 <field name="shares_count"/></span>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_social_media_post_form" model="ir.ui.view">
+            <field name="name">social.media.post.form</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <form string="Social Media Post">
+                    <header>
+                        <button name="action_generate_ai_content" type="object" string="Generate Content" class="oe_highlight"/>
+                        <button name="action_schedule" type="object" string="Schedule" attrs="{'invisible': [('state', '=', 'published')]}"/>
+                        <button name="action_publish" type="object" string="Publish Now"/>
+                        <button name="action_open_osint_dashboard" type="object" string="Analytics"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,scheduled,published,failed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="%(action_social_media_osint_analysis)d" type="action" class="oe_stat_button" icon="fa-bar-chart">
+                                <field name="engagement_score" widget="statinfo" string="Engagement"/>
+                            </button>
+                            <button name="%(action_social_media_newsletters)d" type="action" class="oe_stat_button" icon="fa-newspaper-o">
+                                <field name="newsletter_mailing_id" widget="statinfo" string="Newsletter"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="account_id"/>
+                                <field name="campaign_id"/>
+                                <field name="scheduled_date"/>
+                                <field name="published_date" readonly="1"/>
+                                <field name="auto_publish"/>
+                                <field name="allow_comments"/>
+                            </group>
+                            <group>
+                                <field name="hashtags"/>
+                                <field name="target_audience"/>
+                                <field name="tags" widget="many2many_tags"/>
+                                <field name="ai_tone"/>
+                                <field name="ai_temperature"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Content">
+                                <field name="message" widget="html" options="{'style-inline': true}"/>
+                                <field name="media_ids" widget="many2many_binary"/>
+                            </page>
+                            <page string="AI">
+                                <group>
+                                    <field name="ai_prompt"/>
+                                    <field name="ai_response" widget="text" readonly="1"/>
+                                    <field name="ai_model" readonly="1"/>
+                                </group>
+                            </page>
+                            <page string="Performance">
+                                <group>
+                                    <field name="likes_count"/>
+                                    <field name="comments_count"/>
+                                    <field name="shares_count"/>
+                                    <field name="clicks_count"/>
+                                    <field name="sentiment_score"/>
+                                    <field name="engagement_reach"/>
+                                </group>
+                                <field name="metadata_json" widget="text" readonly="1"/>
+                            </page>
+                            <page string="OSINT">
+                                <field name="osint_snapshot_ids">
+                                    <tree string="OSINT Snapshots">
+                                        <field name="snapshot_at"/>
+                                        <field name="likes_count"/>
+                                        <field name="comments_count"/>
+                                        <field name="shares_count"/>
+                                        <field name="sentiment_score"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_social_media_post_search" model="ir.ui.view">
+            <field name="name">social.media.post.search</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <search string="Search Posts">
+                    <field name="name"/>
+                    <field name="account_id"/>
+                    <filter string="Published" name="published" domain="[('state', '=', 'published')]"/>
+                    <filter string="Scheduled" name="scheduled" domain="[('state', '=', 'scheduled')]"/>
+                    <filter string="AI Drafts" name="ai_drafts" domain="[('ai_response', '!=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Account" name="group_account" context="{'group_by': 'account_id'}"/>
+                        <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_social_media_post_graph" model="ir.ui.view">
+            <field name="name">social.media.post.graph</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <graph string="Post Metrics" type="line">
+                    <field name="scheduled_date" type="row" interval="day"/>
+                    <field name="engagement_score" type="measure"/>
+                    <field name="sentiment_score" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_social_media_post_pivot" model="ir.ui.view">
+            <field name="name">social.media.post.pivot</field>
+            <field name="model">social.media.post</field>
+            <field name="arch" type="xml">
+                <pivot string="Post Analytics">
+                    <field name="account_id" type="row"/>
+                    <field name="state" type="col"/>
+                    <field name="engagement_score" type="measure"/>
+                    <field name="sentiment_score" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_social_media_posts" model="ir.actions.act_window">
+            <field name="name">Posts</field>
+            <field name="res_model">social.media.post</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot</field>
+            <field name="search_view_id" ref="view_social_media_post_search"/>
+        </record>
+
+        <record id="action_social_media_posts_schedule" model="ir.actions.act_window">
+            <field name="name">Schedule Posts</field>
+            <field name="res_model">social.media.schedule.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_social_media_schedule_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="action_social_media_posts_ai" model="ir.actions.act_window">
+            <field name="name">Generate with AI</field>
+            <field name="res_model">social.media.ai.content.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_social_media_ai_content_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_social_media_schedule_wizard" model="ir.ui.view">
+            <field name="name">social.media.schedule.wizard.form</field>
+            <field name="model">social.media.schedule.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Schedule Posts">
+                    <group>
+                        <field name="post_ids" widget="many2many_tags"/>
+                        <field name="scheduled_date"/>
+                        <field name="apply_offset"/>
+                        <field name="offset_hours" attrs="{'invisible': [('apply_offset', '=', False)]}"/>
+                    </group>
+                    <footer>
+                        <button string="Schedule" type="object" name="action_apply_schedule" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_social_media_ai_content_wizard" model="ir.ui.view">
+            <field name="name">social.media.ai.content.wizard.form</field>
+            <field name="model">social.media.ai.content.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate content with AI">
+                    <group>
+                        <field name="post_id" invisible="1"/>
+                        <field name="tone"/>
+                        <field name="hashtags"/>
+                        <field name="target_audience"/>
+                        <field name="temperature"/>
+                        <field name="prompt" widget="text"/>
+                    </group>
+                    <footer>
+                        <button string="Generate" type="object" name="action_generate" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,118 @@
+<odoo>
+    <data>
+        <record id="view_social_media_account_tree" model="ir.ui.view">
+            <field name="name">social.media.account.tree</field>
+            <field name="model">social.media.account</field>
+            <field name="arch" type="xml">
+                <tree string="Social Media Accounts" decoration-info="is_active == False">
+                    <field name="name"/>
+                    <field name="platform"/>
+                    <field name="account_identifier"/>
+                    <field name="posts_count"/>
+                    <field name="scheduled_posts_count"/>
+                    <field name="follower_count"/>
+                    <field name="engagement_rate" widget="float_time"/>
+                    <field name="last_synced_at"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_social_media_account_form" model="ir.ui.view">
+            <field name="name">social.media.account.form</field>
+            <field name="model">social.media.account</field>
+            <field name="arch" type="xml">
+                <form string="Social Media Account">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="platform"/>
+                                <field name="account_identifier"/>
+                                <field name="is_active"/>
+                                <field name="description" widget="text"/>
+                            </group>
+                            <group>
+                                <field name="timezone"/>
+                                <field name="default_post_time"/>
+                                <field name="follower_count"/>
+                                <field name="following_count"/>
+                                <field name="engagement_rate"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Posts">
+                                <field name="posts_ids">
+                                    <tree string="Posts" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="state"/>
+                                        <field name="scheduled_date"/>
+                                        <field name="published_date"/>
+                                        <field name="engagement_score"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="OSINT">
+                                <field name="osint_snapshot_ids" context="{'default_account_id': active_id}">
+                                    <tree string="Snapshots">
+                                        <field name="snapshot_at"/>
+                                        <field name="likes_count"/>
+                                        <field name="comments_count"/>
+                                        <field name="shares_count"/>
+                                        <field name="sentiment_score"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Credentials">
+                                <group groups="base.group_system">
+                                    <field name="access_token" password="True"/>
+                                    <field name="refresh_token" password="True"/>
+                                    <field name="webhook_secret" password="True"/>
+                                    <field name="incoming_webhook_url"/>
+                                </group>
+                            </page>
+                            <page string="Team">
+                                <field name="team_ids" widget="many2many_tags"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <header>
+                        <button name="action_refresh_metrics" type="object" string="Refresh" class="oe_highlight"/>
+                        <button name="action_fetch_osint_data" type="object" string="Fetch OSINT"/>
+                        <field name="last_synced_at" widget="datetime"/>
+                    </header>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_social_media_posts)d" type="action" class="oe_stat_button" icon="fa-send">
+                            <field string="Posts" name="posts_count" widget="statinfo"/>
+                        </button>
+                        <button name="%(action_social_media_osint_analysis)d" type="action" class="oe_stat_button" icon="fa-line-chart">
+                            <field string="OSINT" name="osint_last_snapshot" widget="datetime"/>
+                        </button>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_social_media_account_search" model="ir.ui.view">
+            <field name="name">social.media.account.search</field>
+            <field name="model">social.media.account</field>
+            <field name="arch" type="xml">
+                <search string="Search Accounts">
+                    <field name="name"/>
+                    <field name="platform"/>
+                    <filter string="Active" name="active" domain="[('is_active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('is_active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Platform" name="group_platform" context="{'group_by': 'platform'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_social_media_accounts" model="ir.actions.act_window">
+            <field name="name">Social Accounts</field>
+            <field name="res_model">social.media.account</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="search_view_id" ref="view_social_media_account_search"/>
+        </record>
+    </data>
+</odoo>

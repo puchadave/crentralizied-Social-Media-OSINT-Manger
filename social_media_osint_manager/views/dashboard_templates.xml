@@ -1,0 +1,91 @@
+<odoo>
+    <data>
+        <record id="action_social_media_dashboard" model="ir.actions.client">
+            <field name="name">Social Intelligence Dashboard</field>
+            <field name="tag">social_media_osint_dashboard</field>
+        </record>
+
+        <template id="social_media_osint_dashboard_template" inherit_id="web.webclient_bootstrap" name="Social Media Dashboard Template"/>
+
+        <template id="social_media_osint_manager.dashboard" name="Social Media Intelligence Dashboard">
+            <div class="o_social_media_dashboard">
+                <div class="o_dashboard_header">
+                    <h2>Social Media Intelligence</h2>
+                    <div class="o_dashboard_filters">
+                        <select t-on-change="onAccountChange">
+                            <option value="" t-att-selected="!state.accountId">All Accounts</option>
+                            <t t-foreach="state.accounts" t-as="acc">
+                                <option t-att-value="acc.id" t-att-selected="String(acc.id) === String(state.accountId)"><t t-esc="acc.display_name"/></option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="o_dashboard_metrics" role="list">
+                    <t t-foreach="state.metrics" t-as="metric">
+                        <div class="o_metric_card" role="listitem">
+                            <span class="o_metric_label"><t t-esc="metric.label"/></span>
+                            <span class="o_metric_value"><t t-esc="metric.value"/></span>
+                        </div>
+                    </t>
+                </div>
+                <div class="o_dashboard_charts">
+                    <div class="o_chart" aria-label="Engagement trend">
+                        <h3>Engagement Trend</h3>
+                        <div class="o_chart_bars">
+                            <t t-foreach="state.engagementSeries" t-as="point">
+                                <div class="o_chart_bar" t-att-style="'height: %s%%' % point.height">
+                                    <span class="o_chart_label"><t t-esc="point.label"/></span>
+                                    <span class="o_chart_value"><t t-esc="point.value"/></span>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="o_chart" aria-label="Sentiment distribution">
+                        <h3>Sentiment Distribution</h3>
+                        <div class="o_chart_bars o_chart_bars-horizontal">
+                            <t t-foreach="state.sentimentSeries" t-as="point">
+                                <div class="o_chart_bar" t-att-style="'width: %s%%' % point.width">
+                                    <span class="o_chart_label"><t t-esc="point.label"/></span>
+                                    <span class="o_chart_value"><t t-esc="point.value"/></span>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <div class="o_dashboard_table">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Post</th>
+                                <th>Account</th>
+                                <th>Likes</th>
+                                <th>Comments</th>
+                                <th>Shares</th>
+                                <th>Sentiment</th>
+                                <th>Engagement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="!state.posts">
+                                <tr>
+                                    <td colspan="7" class="text-center">No data available</td>
+                                </tr>
+                            </t>
+                            <t t-foreach="state.posts" t-as="post">
+                                <tr>
+                                    <td><t t-esc="post.title"/></td>
+                                    <td><t t-esc="post.account"/></td>
+                                    <td><t t-esc="post.likes"/></td>
+                                    <td><t t-esc="post.comments"/></td>
+                                    <td><t t-esc="post.shares"/></td>
+                                    <td><t t-esc="post.sentiment"/></td>
+                                    <td><t t-esc="post.engagement"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

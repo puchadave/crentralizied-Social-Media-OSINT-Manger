@@ -1,0 +1,100 @@
+<odoo>
+    <data>
+        <record id="view_social_media_newsletter_tree" model="ir.ui.view">
+            <field name="name">social.media.newsletter.tree</field>
+            <field name="model">social.media.newsletter</field>
+            <field name="arch" type="xml">
+                <tree string="Newsletters">
+                    <field name="name"/>
+                    <field name="state"/>
+                    <field name="scheduled_date"/>
+                    <field name="summary"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_social_media_newsletter_form" model="ir.ui.view">
+            <field name="name">social.media.newsletter.form</field>
+            <field name="model">social.media.newsletter</field>
+            <field name="arch" type="xml">
+                <form string="Newsletter">
+                    <header>
+                        <button name="action_generate_from_posts" type="object" string="Generate" class="oe_highlight"/>
+                        <button name="action_prepare_mailing" type="object" string="Create Mailing"/>
+                        <button name="action_send" type="object" string="Send" attrs="{'invisible': [('state', '=', 'sent')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,ready,sent"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="account_ids" widget="many2many_tags"/>
+                            <field name="post_ids" widget="many2many_tags"/>
+                            <field name="scheduled_date"/>
+                            <field name="mailing_id" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Content">
+                                <field name="newsletter_body" widget="html" options="{'style-inline': true}"/>
+                            </page>
+                            <page string="Summary">
+                                <field name="summary" widget="text"/>
+                            </page>
+                            <page string="AI Details">
+                                <field name="ai_prompt" widget="text"/>
+                                <field name="ai_response" widget="text" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_social_media_newsletter_search" model="ir.ui.view">
+            <field name="name">social.media.newsletter.search</field>
+            <field name="model">social.media.newsletter</field>
+            <field name="arch" type="xml">
+                <search string="Search Newsletters">
+                    <field name="name"/>
+                    <field name="state"/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Ready" name="ready" domain="[('state', '=', 'ready')]"/>
+                    <filter string="Sent" name="sent" domain="[('state', '=', 'sent')]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_social_media_newsletters" model="ir.actions.act_window">
+            <field name="name">Newsletters</field>
+            <field name="res_model">social.media.newsletter</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_social_media_newsletter_search"/>
+        </record>
+
+        <record id="action_social_media_newsletter_wizard" model="ir.actions.act_window">
+            <field name="name">Create Newsletter</field>
+            <field name="res_model">social.media.newsletter.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_social_media_newsletter_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_social_media_newsletter_wizard" model="ir.ui.view">
+            <field name="name">social.media.newsletter.wizard.form</field>
+            <field name="model">social.media.newsletter.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Generate Newsletter">
+                    <group>
+                        <field name="newsletter_name"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                        <field name="post_ids" widget="many2many_tags"/>
+                        <field name="ai_prompt" widget="text"/>
+                    </group>
+                    <footer>
+                        <button string="Generate" type="object" name="action_create_newsletter" class="btn-primary"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
