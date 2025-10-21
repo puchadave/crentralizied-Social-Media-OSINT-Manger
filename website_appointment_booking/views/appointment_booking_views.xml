@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_appointment_booking_tree" model="ir.ui.view">
+        <field name="name">appointment.booking.tree</field>
+        <field name="model">appointment.booking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="slot_id"/>
+                <field name="service_id"/>
+                <field name="partner_name"/>
+                <field name="partner_email"/>
+                <field name="partner_phone"/>
+                <field name="state"/>
+                <field name="create_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_appointment_booking_form" model="ir.ui.view">
+        <field name="name">appointment.booking.form</field>
+        <field name="model">appointment.booking</field>
+        <field name="arch" type="xml">
+            <form string="Appointment Booking">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_confirm" string="Confirm" class="oe_stat_button" icon="fa-check" attrs="{'invisible': [('state', '=', 'confirmed')]}"/>
+                        <button type="object" name="action_cancel" string="Cancel Booking" class="oe_stat_button" icon="fa-times" attrs="{'invisible': [('state', '=', 'cancelled')]}"/>
+                    </div>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="state" widget="statusbar" statusbar_visible="pending,confirmed,cancelled"/>
+                        <field name="slot_id" options="{'no_create': False}"/>
+                        <field name="service_id" readonly="1"/>
+                    </group>
+                    <group string="Contact Information">
+                        <field name="partner_id" options="{'no_create_edit': True}"/>
+                        <field name="partner_name"/>
+                        <field name="partner_email"/>
+                        <field name="partner_phone"/>
+                    </group>
+                    <group>
+                        <field name="notes" colspan="2"/>
+                        <field name="website_source" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Confirm" type="object" name="action_confirm" class="btn-primary" attrs="{'invisible': [('state', '=', 'confirmed')]}"/>
+                    <button string="Cancel Booking" type="object" name="action_cancel" attrs="{'invisible': [('state', '=', 'cancelled')]}"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_appointment_booking_search" model="ir.ui.view">
+        <field name="name">appointment.booking.search</field>
+        <field name="model">appointment.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="slot_id"/>
+                <field name="service_id"/>
+                <filter string="Pending" name="state_pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Confirmed" name="state_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelled" name="state_cancelled" domain="[('state', '=', 'cancelled')]"/>
+            </search>
+        </field>
+    </record>
+</odoo>

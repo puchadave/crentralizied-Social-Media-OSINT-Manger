@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_appointment_slot_tree" model="ir.ui.view">
+        <field name="name">appointment.slot.tree</field>
+        <field name="model">appointment.slot</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="service_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="capacity"/>
+                <field name="booked_count"/>
+                <field name="available_capacity"/>
+                <field name="state"/>
+                <field name="website_published"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_appointment_slot_form" model="ir.ui.view">
+        <field name="name">appointment.slot.form</field>
+        <field name="model">appointment.slot</field>
+        <field name="arch" type="xml">
+            <form string="Appointment Slot">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="service_id" options="{'no_create': False}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                    </group>
+                    <group>
+                        <field name="start_datetime"/>
+                        <field name="end_datetime"/>
+                        <field name="capacity"/>
+                        <field name="website_published"/>
+                    </group>
+                    <group string="Statistics">
+                        <field name="booked_count" readonly="1"/>
+                        <field name="available_capacity" readonly="1"/>
+                        <field name="is_fully_booked" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Bookings">
+                            <field name="booking_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_name"/>
+                                    <field name="partner_email"/>
+                                    <field name="partner_phone"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Open" type="object" name="action_open" class="btn-primary" attrs="{'invisible': [('state', '=', 'open')]}"/>
+                    <button string="Close" type="object" name="action_close" attrs="{'invisible': [('state', '=', 'closed')]}"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_appointment_slot_calendar" model="ir.ui.view">
+        <field name="name">appointment.slot.calendar</field>
+        <field name="model">appointment.slot</field>
+        <field name="arch" type="xml">
+            <calendar date_start="start_datetime" date_stop="end_datetime" color="service_id">
+                <field name="name"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_appointment_slot_search" model="ir.ui.view">
+        <field name="name">appointment.slot.search</field>
+        <field name="model">appointment.slot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="service_id"/>
+                <filter string="Open" name="state_open" domain="[('state', '=', 'open')]"/>
+                <filter string="Published" name="website_published" domain="[('website_published', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+</odoo>
