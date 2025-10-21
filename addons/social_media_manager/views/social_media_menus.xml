@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem id="menu_social_media_manager_root" name="Social Media Manager" parent="marketing_automation.menu_marketing_root" sequence="20" />
+
+    <act_window
+        id="action_social_media_account"
+        name="Social Accounts"
+        res_model="social.media.account"
+        view_mode="kanban,tree,form"
+        context="{'default_active': True}"
+    />
+    <menuitem id="menu_social_media_account" name="Accounts" parent="menu_social_media_manager_root" action="action_social_media_account" sequence="1" />
+
+    <act_window
+        id="action_social_media_post"
+        name="Posts"
+        res_model="social.media.post"
+        view_mode="kanban,tree,calendar,form"
+    />
+    <menuitem id="menu_social_media_post" name="Posts" parent="menu_social_media_manager_root" action="action_social_media_post" sequence="2" />
+
+    <act_window
+        id="action_social_media_metric"
+        name="Metrics"
+        res_model="social.media.metric"
+        view_mode="pivot,graph,tree,form"
+    />
+    <menuitem id="menu_social_media_metric" name="Metrics" parent="menu_social_media_manager_root" action="action_social_media_metric" sequence="3" />
+
+    <act_window
+        id="action_social_media_prompt"
+        name="AI Prompts"
+        res_model="social.media.prompt"
+        view_mode="tree,form"
+    />
+    <menuitem id="menu_social_media_prompt" name="AI Prompts" parent="menu_social_media_manager_root" action="action_social_media_prompt" sequence="4" />
+
+    <menuitem id="menu_social_media_dashboard" name="Dashboard" parent="menu_social_media_manager_root" action="action_social_media_dashboard" sequence="0" />
+</odoo>

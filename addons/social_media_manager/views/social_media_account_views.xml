@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_social_media_account_tree" model="ir.ui.view">
+        <field name="name">social.media.account.tree</field>
+        <field name="model">social.media.account</field>
+        <field name="arch" type="xml">
+            <tree string="Social Media Accounts">
+                <field name="name" />
+                <field name="platform" />
+                <field name="company_id" />
+                <field name="follower_count" />
+                <field name="engagement_rate" />
+                <field name="last_sync_date" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_social_media_account_form" model="ir.ui.view">
+        <field name="name">social.media.account.form</field>
+        <field name="model">social.media.account</field>
+        <field name="arch" type="xml">
+            <form string="Social Media Account">
+                <header>
+                    <button name="action_refresh_token" type="object" string="Refresh Token" class="oe_highlight" />
+                    <button name="action_sync_metrics" type="object" string="Sync Metrics" />
+                    <field name="active" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="platform" />
+                            <field name="company_id" />
+                            <field name="prompt_template_id" />
+                        </group>
+                        <group>
+                            <field name="follower_count" />
+                            <field name="engagement_rate" />
+                            <field name="last_sync_date" />
+                            <field name="remark" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Credentials">
+                            <group>
+                                <field name="access_token" password="True" />
+                                <field name="refresh_token" password="True" />
+                                <field name="token_expiration" />
+                                <field name="api_key" password="True" />
+                                <field name="api_secret" password="True" />
+                            </group>
+                        </page>
+                        <page string="Posts">
+                            <field name="post_ids" context="{'default_account_id': active_id}" />
+                        </page>
+                        <page string="Metrics">
+                            <field name="metric_ids" context="{'default_account_id': active_id}" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_social_media_account_kanban" model="ir.ui.view">
+        <field name="name">social.media.account.kanban</field>
+        <field name="model">social.media.account</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="platform">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <field name="name" />
+                            <div class="oe_kanban_details">
+                                <strong><field name="platform" /></strong>
+                                <span t-field="record.company_id" />
+                                <div>
+                                    <span>Followers: </span><span t-field="record.follower_count" />
+                                </div>
+                                <div>
+                                    <span>Engagement: </span><span t-field="record.engagement_rate" />
+                                </div>
+                            </div>
+                            <div class="oe_kanban_footer">
+                                <button type="object" name="action_sync_metrics" class="oe_highlight oe_kanban_action">Sync</button>
+                                <button type="object" name="action_refresh_token" class="oe_kanban_action">Refresh Token</button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

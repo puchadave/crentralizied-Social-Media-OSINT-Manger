@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_social_media_dashboard" model="ir.actions.client">
+        <field name="name">Social Media Dashboard</field>
+        <field name="tag">board.board</field>
+        <field name="context" eval="{'default_board_id': ref('social_media_manager.social_media_dashboard_board') }" />
+    </record>
+
+    <record id="social_media_dashboard_board" model="board.board">
+        <field name="name">Social Media Dashboard</field>
+        <field name="active" eval="True" />
+        <field name="column1" type="html">
+            <![CDATA[
+                <action string="Followers Growth" name="%(action_social_media_metric)d" view_mode="graph"/>
+                <action string="Engagement Heatmap" name="%(action_social_media_metric)d" view_mode="pivot"/>
+            ]]>
+        </field>
+        <field name="column2" type="html">
+            <![CDATA[
+                <action string="Publishing Calendar" name="%(action_social_media_post)d" view_mode="calendar"/>
+                <action string="Campaign Performance" name="%(action_social_media_metric)d" view_mode="tree"/>
+            ]]>
+        </field>
+    </record>
+</odoo>

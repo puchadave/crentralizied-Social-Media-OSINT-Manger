@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="ir_cron_social_media_publish" model="ir.cron">
+        <field name="name">Publish Scheduled Social Posts</field>
+        <field name="model_id" ref="model_social_media_post" />
+        <field name="state">code</field>
+        <field name="code">model.cron_publish_posts()</field>
+        <field name="interval_type">minutes</field>
+        <field name="interval_number">15</field>
+        <field name="numbercall">-1</field>
+        <field name="priority">5</field>
+    </record>
+
+    <record id="ir_cron_social_media_sync_metrics" model="ir.cron">
+        <field name="name">Synchronize Social Media Metrics</field>
+        <field name="model_id" ref="model_social_media_account" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_metrics()</field>
+        <field name="interval_type">hours</field>
+        <field name="interval_number">2</field>
+        <field name="numbercall">-1</field>
+        <field name="priority">5</field>
+    </record>
+</odoo>
