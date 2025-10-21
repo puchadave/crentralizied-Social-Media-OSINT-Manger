@@ -48,6 +48,12 @@ if [[ ! -x "$APPIMAGETOOL_BINARY" ]]; then
   chmod +x "$APPIMAGETOOL_BINARY"
 fi
 
-"$APPIMAGETOOL_BINARY" "$APPDIR" "$OUTPUT_APPIMAGE"
+ARCH_VALUE="${ARCH:-$(uname -m)}"
+if [[ -z "$ARCH_VALUE" ]]; then
+  echo "[WebOwie] Konnte die Zielarchitektur nicht ermitteln. Bitte ARCH manuell setzen." >&2
+  exit 1
+fi
+
+ARCH="$ARCH_VALUE" "$APPIMAGETOOL_BINARY" "$APPDIR" "$OUTPUT_APPIMAGE"
 
 echo "[WebOwie] AppImage erzeugt: $OUTPUT_APPIMAGE"
