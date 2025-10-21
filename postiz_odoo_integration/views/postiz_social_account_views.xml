@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_postiz_social_account_tree" model="ir.ui.view">
+        <field name="name">postiz.social.account.tree</field>
+        <field name="model">postiz.social.account</field>
+        <field name="arch" type="xml">
+            <tree string="Social Accounts">
+                <field name="name"/>
+                <field name="platform_id"/>
+                <field name="workspace_id"/>
+                <field name="page_identifier"/>
+                <field name="state" widget="badge"/>
+                <field name="last_sync"/>
+                <field name="sync_status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_account_form" model="ir.ui.view">
+        <field name="name">postiz.social.account.form</field>
+        <field name="model">postiz.social.account</field>
+        <field name="arch" type="xml">
+            <form string="Social Account">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_connect" string="Connect" type="object" class="oe_stat_button" attrs="{'invisible': [('state', '=', 'connected')]}"/>
+                        <button name="action_refresh_token" string="Refresh Token" type="object" class="oe_stat_button" attrs="{'invisible': [('state', '!=', 'connected')]}"/>
+                        <button name="action_fetch_metrics" string="Fetch metrics" type="object" class="oe_stat_button"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="workspace_id"/>
+                            <field name="platform_id"/>
+                            <field name="state" widget="statusbar" statusbar_visible="draft,connected,expired,error"/>
+                        </group>
+                        <group>
+                            <field name="page_identifier"/>
+                            <field name="page_name"/>
+                            <field name="token_expiration"/>
+                            <field name="webhook_token" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tokens" groups="postiz_odoo_integration.group_postiz_manager">
+                            <group>
+                                <field name="token" password="True"/>
+                                <field name="refresh_token" password="True"/>
+                            </group>
+                        </page>
+                        <page string="Campaigns">
+                            <field name="campaign_tag_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Metadata">
+                            <field name="metadata" widget="json"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_postiz_social_account" model="ir.actions.act_window">
+        <field name="name">Social Accounts</field>
+        <field name="res_model">postiz.social.account</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

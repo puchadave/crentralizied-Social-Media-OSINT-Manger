@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_postiz_social_post_tree" model="ir.ui.view">
+        <field name="name">postiz.social.post.tree</field>
+        <field name="model">postiz.social.post</field>
+        <field name="arch" type="xml">
+            <tree string="Posts" default_order="scheduled_at desc">
+                <field name="name"/>
+                <field name="workspace_id"/>
+                <field name="state" widget="badge"/>
+                <field name="approval_state" widget="badge"/>
+                <field name="scheduled_at"/>
+                <field name="published_at"/>
+                <field name="has_failed_channels"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_post_kanban" model="ir.ui.view">
+        <field name="name">postiz.social.post.kanban</field>
+        <field name="model">postiz.social.post</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="scheduled_at"/>
+                <field name="account_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <t t-set="state_class" t-value="'o_postiz_post_state_' + record.state.raw_value"/>
+                            <div class="o_postiz_kanban_badge" t-attf-class="#{state_class}">
+                                <t t-esc="record.state.value"/>
+                            </div>
+                            <div class="o_kanban_primary_bottom">
+                                <strong><t t-esc="record.name.value"/></strong>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="text-muted">
+                                    <t t-if="record.scheduled_at.raw_value">Scheduled: <t t-esc="record.scheduled_at.value"/></t>
+                                    <t t-else="">No schedule</t>
+                                </div>
+                                <div>
+                                    <i class="fa fa-share-alt"/> <t t-esc="record.account_ids.value"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_post_form" model="ir.ui.view">
+        <field name="name">postiz.social.post.form</field>
+        <field name="model">postiz.social.post</field>
+        <field name="arch" type="xml">
+            <form string="Post">
+                <header>
+                    <button name="action_publish" type="object" string="Publish now" attrs="{'invisible': ['|', ('state', '=', 'published'), ('can_publish', '=', False)]}" class="btn-primary"/>
+                    <button name="action_schedule" type="object" string="Schedule" attrs="{'invisible': [('state', 'in', ('published','canceled'))]}"/>
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', '=', 'canceled')]}"/>
+                    <button name="action_retry_failed" type="object" string="Retry failed" attrs="{'invisible': [('has_failed_channels', '=', False)]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,scheduled,queued,publishing,published,failed,canceled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="workspace_id"/>
+                            <field name="account_ids" widget="many2many_tags"/>
+                            <field name="campaign_id"/>
+                            <field name="approval_state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                        </group>
+                        <group>
+                            <field name="scheduled_at"/>
+                            <field name="deadline"/>
+                            <field name="published_at" readonly="1"/>
+                            <field name="allow_comments"/>
+                            <field name="preview_image_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <field name="body_text" widget="html"/>
+                            <field name="link_url"/>
+                            <field name="media_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="mimetype"/>
+                                    <field name="url"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Channels">
+                            <field name="channel_ids">
+                                <tree editable="bottom">
+                                    <field name="account_id" readonly="1"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="external_id"/>
+                                    <field name="published_at"/>
+                                    <field name="error_message"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Analytics">
+                            <field name="analytics_metric_ids">
+                                <tree>
+                                    <field name="capture_date"/>
+                                    <field name="impressions"/>
+                                    <field name="clicks"/>
+                                    <field name="likes"/>
+                                    <field name="comments"/>
+                                    <field name="shares"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_post_calendar" model="ir.ui.view">
+        <field name="name">postiz.social.post.calendar</field>
+        <field name="model">postiz.social.post</field>
+        <field name="arch" type="xml">
+            <calendar string="Editorial calendar" date_start="scheduled_at" color="workspace_id">
+                <field name="name"/>
+                <field name="workspace_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_postiz_social_post" model="ir.actions.act_window">
+        <field name="name">Posts</field>
+        <field name="res_model">postiz.social.post</field>
+        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="context">{"default_workspace_id": active_id}</field>
+    </record>
+</odoo>

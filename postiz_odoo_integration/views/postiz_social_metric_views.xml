@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_postiz_social_metric_tree" model="ir.ui.view">
+        <field name="name">postiz.social.metric.tree</field>
+        <field name="model">postiz.social.metric</field>
+        <field name="arch" type="xml">
+            <tree string="Metrics">
+                <field name="capture_date"/>
+                <field name="account_id"/>
+                <field name="post_id"/>
+                <field name="impressions"/>
+                <field name="clicks"/>
+                <field name="likes"/>
+                <field name="comments"/>
+                <field name="shares"/>
+                <field name="saves"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_metric_graph" model="ir.ui.view">
+        <field name="name">postiz.social.metric.graph</field>
+        <field name="model">postiz.social.metric</field>
+        <field name="arch" type="xml">
+            <graph string="Metrics" type="bar" stacked="True">
+                <field name="capture_date" type="row" interval="day"/>
+                <field name="impressions" type="measure"/>
+                <field name="clicks" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_metric_pivot" model="ir.ui.view">
+        <field name="name">postiz.social.metric.pivot</field>
+        <field name="model">postiz.social.metric</field>
+        <field name="arch" type="xml">
+            <pivot string="Metrics">
+                <field name="capture_date" type="row" interval="day"/>
+                <field name="account_id" type="col"/>
+                <field name="impressions" type="measure"/>
+                <field name="likes" type="measure"/>
+                <field name="comments" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_postiz_social_metric" model="ir.actions.act_window">
+        <field name="name">Analytics</field>
+        <field name="res_model">postiz.social.metric</field>
+        <field name="view_mode">tree,graph,pivot</field>
+        <field name="context">{"search_default_groupby_account_id": 1}</field>
+    </record>
+</odoo>

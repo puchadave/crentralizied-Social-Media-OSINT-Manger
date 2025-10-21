@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_postiz_social_platform_tree" model="ir.ui.view">
+        <field name="name">postiz.social.platform.tree</field>
+        <field name="model">postiz.social.platform</field>
+        <field name="arch" type="xml">
+            <tree string="Platforms">
+                <field name="name"/>
+                <field name="technical_name"/>
+                <field name="auth_type"/>
+                <field name="scope"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_platform_form" model="ir.ui.view">
+        <field name="name">postiz.social.platform.form</field>
+        <field name="model">postiz.social.platform</field>
+        <field name="arch" type="xml">
+            <form string="Platform">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="technical_name"/>
+                            <field name="auth_type"/>
+                            <field name="scope"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="base_url"/>
+                            <field name="documentation_url"/>
+                            <field name="is_active"/>
+                            <field name="webhook_route" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_postiz_social_platform" model="ir.actions.act_window">
+        <field name="name">Platforms</field>
+        <field name="res_model">postiz.social.platform</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[("is_active", "=", True)]</field>
+    </record>
+</odoo>

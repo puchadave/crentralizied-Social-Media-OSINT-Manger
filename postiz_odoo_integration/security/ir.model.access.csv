@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+postiz_workspace_user_access,postiz.social.workspace user,model_postiz_social_workspace,postiz_odoo_integration.group_postiz_user,1,0,0,0
+postiz_workspace_manager_access,postiz.social.workspace manager,model_postiz_social_workspace,postiz_odoo_integration.group_postiz_manager,1,1,1,1
+postiz_account_user_access,postiz.social.account user,model_postiz_social_account,postiz_odoo_integration.group_postiz_user,1,0,0,0
+postiz_account_manager_access,postiz.social.account manager,model_postiz_social_account,postiz_odoo_integration.group_postiz_manager,1,1,1,1
+postiz_platform_manager_access,postiz.social.platform manager,model_postiz_social_platform,postiz_odoo_integration.group_postiz_manager,1,1,1,1
+postiz_post_user_access,postiz.social.post user,model_postiz_social_post,postiz_odoo_integration.group_postiz_user,1,1,1,0
+postiz_post_manager_access,postiz.social.post manager,model_postiz_social_post,postiz_odoo_integration.group_postiz_manager,1,1,1,1
+postiz_post_media_user_access,postiz.social.post.media user,model_postiz_social_post_media,postiz_odoo_integration.group_postiz_user,1,1,1,0
+postiz_post_channel_user_access,postiz.social.post.channel user,model_postiz_social_post_channel,postiz_odoo_integration.group_postiz_user,1,1,0,0
+postiz_metric_user_access,postiz.social.metric user,model_postiz_social_metric,postiz_odoo_integration.group_postiz_user,1,0,0,0
+postiz_metric_manager_access,postiz.social.metric manager,model_postiz_social_metric,postiz_odoo_integration.group_postiz_manager,1,1,1,0
+postiz_bulk_publish_wizard_access,postiz.bulk.publish.wizard,model_postiz_bulk_publish_wizard,postiz_odoo_integration.group_postiz_user,1,1,1,1
