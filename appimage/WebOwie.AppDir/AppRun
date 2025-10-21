@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APPDIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export APPDIR
+export WEBOWIE_STACK_SOURCE_DIR="$APPDIR/usr/share/webowie-stack"
+export WEBOWIE_RUNTIME_DIR="${WEBOWIE_RUNTIME_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/webowie-stack}"
+
+LAUNCHER="$APPDIR/usr/bin/webowie-launcher"
+if [[ ! -x "$LAUNCHER" ]]; then
+  echo "[WebOwie] Launcher nicht gefunden." >&2
+  exit 1
+fi
+
+if [[ $# -gt 0 ]]; then
+  exec "$LAUNCHER" "$@"
+else
+  exec "$LAUNCHER" start
+fi

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=WebOwie Control Center
+Comment=Starte und verwalte den WebOwie Marketing & OSINT Stack
+Exec=webowie-launcher start
+Icon=webowie
+Terminal=true
+Categories=Network;Office;Utility;

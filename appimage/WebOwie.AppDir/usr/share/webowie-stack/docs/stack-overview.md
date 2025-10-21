@@ -65,9 +65,3 @@ Dieser Leitfaden hilft dir beim technischen Onboarding des gesamten Docker-Compo
 - Experimentiere mit KI-gesteuerten Workflows (z. B. automatische Video-Zusammenfassungen via ffmpeg + Whisper + Ollama).
 
 > Dokumentiere jede Änderung im `docs/` Ordner, damit dein Team den Wissenstransfer nachvollziehen kann.
-
-## 9. Distribution als AppImage
-- Nutze `./appimage/build-appimage.sh`, um eine portable `WebOwie.AppImage` zu erzeugen.
-- Beim ersten Start kopiert das AppImage den Stack nach `~/.local/share/webowie-stack` und erzeugt automatisch eine `.env`.
-- Verteile die Datei intern, damit Stakeholder den Stack ohne separates Git-Checkout starten können (Docker & Compose bleiben Voraussetzung).
-- Details & Troubleshooting findest du im [AppImage Guide](appimage-guide.md).

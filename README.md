@@ -42,6 +42,22 @@ Der WebOwie-Stack bündelt alle Bausteine, die ein Social Media & Marketing Spec
 
    > **Hinweis:** Für OpenSearch ist auf Linux-Hosts `sudo sysctl -w vm.max_map_count=262144` erforderlich, bevor du den Stack startest.
 
+### Alternative: WebOwie als AppImage starten
+
+Wenn du lieber eine selbstenthaltende Desktop-Datei nutzen möchtest, kannst du den Stack als **WebOwie.AppImage** paketieren. Das AppImage enthält das Launch-Skript sowie die aktuelle `docker-compose.yml` und kümmert sich beim ersten Start um eine lokale Kopie der Konfiguration unter `~/.local/share/webowie-stack`.
+
+```bash
+# AppImage bauen (lädt automatisch appimagetool, falls nicht vorhanden)
+./appimage/build-appimage.sh
+
+# Ausführen
+./dist/WebOwie.AppImage          # Startet den Stack im Hintergrund
+./dist/WebOwie.AppImage stop     # Stoppt alle Dienste
+./dist/WebOwie.AppImage logs n8n # Streamt Logs eines Dienstes
+```
+
+> **Voraussetzungen:** Docker & Docker Compose müssen auf dem Host installiert sein. Beim ersten Aufruf wird `.env` aus der Vorlage erzeugt; passe die Datei in `~/.local/share/webowie-stack/.env` an.
+
 3. **Erstkonfiguration durchführen**
    | Service          | Adresse                       | Zweck |
    |------------------|-------------------------------|-------|
