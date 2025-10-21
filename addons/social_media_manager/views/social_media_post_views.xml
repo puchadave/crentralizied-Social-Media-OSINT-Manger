@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_social_media_post_tree" model="ir.ui.view">
+        <field name="name">social.media.post.tree</field>
+        <field name="model">social.media.post</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="account_id" />
+                <field name="post_type" />
+                <field name="state" />
+                <field name="scheduled_date" />
+                <field name="published_date" />
+                <field name="campaign_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_social_media_post_form" model="ir.ui.view">
+        <field name="name">social.media.post.form</field>
+        <field name="model">social.media.post</field>
+        <field name="arch" type="xml">
+            <form string="Social Media Post">
+                <header>
+                    <button name="action_publish_now" string="Publish Now" type="object" class="btn-primary" />
+                    <button name="action_schedule" string="Schedule" type="object" />
+                    <button name="%(action_social_media_generate_content)d" string="Generate Content" type="action" class="oe_highlight" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,scheduled,posted,failed" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="account_id" />
+                            <field name="post_type" />
+                            <field name="campaign_id" />
+                            <field name="prompt_template_id" />
+                        </group>
+                        <group>
+                            <field name="scheduled_date" />
+                            <field name="published_date" readonly="1" />
+                            <field name="error_message" readonly="1" />
+                            <field name="metrics_summary" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <group>
+                                <field name="caption" />
+                                <field name="body_html" />
+                            </group>
+                        </page>
+                        <page string="Media">
+                            <field name="attachment_ids" widget="many2many_binary" />
+                        </page>
+                        <page string="Prompts">
+                            <field name="hashtag_ids" widget="many2many_tags" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_social_media_post_kanban" model="ir.ui.view">
+        <field name="name">social.media.post.kanban</field>
+        <field name="model">social.media.post</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <strong><field name="name" /></strong>
+                            <div class="text-muted"><field name="account_id" /></div>
+                            <div><field name="caption" /></div>
+                            <div class="oe_kanban_footer">
+                                <button type="object" name="action_publish_now" class="oe_highlight oe_kanban_action">Publish</button>
+                                <button type="object" name="action_schedule" class="oe_kanban_action">Schedule</button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_social_media_post_calendar" model="ir.ui.view">
+        <field name="name">social.media.post.calendar</field>
+        <field name="model">social.media.post</field>
+        <field name="arch" type="xml">
+            <calendar date_start="scheduled_date" color="account_id">
+                <field name="name" />
+                <field name="caption" />
+            </calendar>
+        </field>
+    </record>
+
+    <act_window
+        id="action_social_media_generate_content"
+        name="Generate Content"
+        res_model="social.media.content.wizard"
+        view_mode="form"
+        target="new"
+        context="{'default_post_id': active_id}"
+    />
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_social_media_content_wizard" model="ir.ui.view">
+        <field name="name">social.media.content.wizard.form</field>
+        <field name="model">social.media.content.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Content">
+                <group>
+                    <field name="account_id" />
+                    <field name="post_id" invisible="1" />
+                    <field name="prompt_template_id" />
+                    <field name="additional_context" />
+                </group>
+                <group string="Results">
+                    <field name="generated_caption" />
+                    <field name="generated_body" />
+                    <field name="generated_hashtags" />
+                </group>
+                <footer>
+                    <button string="Generate" name="action_generate" type="object" class="btn-primary" />
+                    <button string="Apply to Post" name="action_apply_to_post" type="object" class="btn-secondary" />
+                    <button string="Close" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

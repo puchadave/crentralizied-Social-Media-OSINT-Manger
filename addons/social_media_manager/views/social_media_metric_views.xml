@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_social_media_metric_tree" model="ir.ui.view">
+        <field name="name">social.media.metric.tree</field>
+        <field name="model">social.media.metric</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="metric_date" />
+                <field name="account_id" />
+                <field name="campaign_id" />
+                <field name="follower_count" />
+                <field name="engagement_rate" />
+                <field name="impressions" />
+                <field name="clicks" />
+                <field name="conversions" />
+                <field name="spend" />
+                <field name="cpc" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_social_media_metric_form" model="ir.ui.view">
+        <field name="name">social.media.metric.form</field>
+        <field name="model">social.media.metric</field>
+        <field name="arch" type="xml">
+            <form string="Social Media Metric">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="metric_date" />
+                            <field name="account_id" />
+                            <field name="post_id" />
+                            <field name="campaign_id" />
+                        </group>
+                        <group>
+                            <field name="follower_count" />
+                            <field name="engagement_rate" />
+                            <field name="impressions" />
+                            <field name="clicks" />
+                            <field name="conversions" />
+                            <field name="spend" />
+                            <field name="cpc" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_social_media_metric_pivot" model="ir.ui.view">
+        <field name="name">social.media.metric.pivot</field>
+        <field name="model">social.media.metric</field>
+        <field name="arch" type="xml">
+            <pivot string="Metrics">
+                <field name="metric_date" type="col" interval="month" />
+                <field name="account_id" type="row" />
+                <field name="impressions" type="measure" />
+                <field name="clicks" type="measure" />
+                <field name="conversions" type="measure" />
+                <field name="spend" type="measure" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_social_media_metric_graph" model="ir.ui.view">
+        <field name="name">social.media.metric.graph</field>
+        <field name="model">social.media.metric</field>
+        <field name="arch" type="xml">
+            <graph string="Metric Trends" type="line">
+                <field name="metric_date" type="row" />
+                <field name="engagement_rate" type="measure" />
+                <field name="follower_count" type="measure" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_social_media_metric_search" model="ir.ui.view">
+        <field name="name">social.media.metric.search</field>
+        <field name="model">social.media.metric</field>
+        <field name="arch" type="xml">
+            <search string="Search Metrics">
+                <field name="account_id" />
+                <field name="campaign_id" />
+                <filter string="This Month" name="this_month" domain="[('metric_date','>=',context_today().replace(day=1))]" />
+                <filter string="Last 90 Days" name="last_90" domain="[('metric_date','>=', (context_today() - relativedelta(days=90)))]" />
+                <group expand="0" string="Group By">
+                    <filter string="Account" context="{'group_by': 'account_id'}" />
+                    <filter string="Campaign" context="{'group_by': 'campaign_id'}" />
+                    <filter string="Week" context="{'group_by': 'metric_date:week'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
