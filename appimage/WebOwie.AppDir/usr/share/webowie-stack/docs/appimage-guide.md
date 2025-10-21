@@ -42,6 +42,7 @@ Beim ersten Start erzeugt das AppImage automatisch ein Konfigurationsverzeichnis
 Darin findest du u. a.:
 
 - `.env` – Kopie der `.env.example`; hier trägst du Passwörter, URLs und Ports ein.
+- Für Appsmith muss die Domain passen: setze `APPSMITH_CUSTOM_DOMAIN` und `APPSMITH_COOKIE_DOMAIN` auf die Adresse, unter der WebOwie erreichbar ist, damit der Login-Screen nicht leer bleibt.
 - `docker-compose.yml` – Compose-Datei, die vom Launcher verwendet wird.
 - `docs/`, `branding/` – Referenzdokumente für Workflows und Assets.
 

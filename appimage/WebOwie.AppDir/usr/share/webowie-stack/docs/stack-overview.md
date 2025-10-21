@@ -32,7 +32,7 @@ Dieser Leitfaden hilft dir beim technischen Onboarding des gesamten Docker-Compo
 
 ## 4. Empfohlene Erstkonfiguration
 1. **Keycloak Realm anlegen** (`webowie`), Clients für Appsmith, n8n, Mautic erstellen.
-2. **Appsmith** starten, Datenquellen für Matomo (MySQL), SEO Panel (MySQL), Mautic (REST), Listmonk (Postgres) hinzufügen.
+2. **Appsmith** starten, Datenquellen für Matomo (MySQL), SEO Panel (MySQL), Mautic (REST), Listmonk (Postgres) hinzufügen. Achte darauf, dass `APPSMITH_CUSTOM_DOMAIN` und `APPSMITH_COOKIE_DOMAIN` in `.env` auf deine öffentliche Domain zeigen; sonst bleibt der Login-Screen leer.
 3. **Metabase** mit Datenbanken verbinden: Matomo (MariaDB), Mautic (MariaDB), Listmonk (Postgres).
 4. **n8n** konfigurieren: Credentials für Social-Netzwerk-APIs (LinkedIn, Meta, X, Reddit, etc.) und Open WebUI.
 5. **Open WebUI**: gewünschte Ollama-Modelle (`ollama run llama3:8b`, `ollama pull mistral`) vorinstallieren.

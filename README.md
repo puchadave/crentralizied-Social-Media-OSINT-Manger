@@ -34,6 +34,8 @@ Der WebOwie-Stack bündelt alle Bausteine, die ein Social Media & Marketing Spec
    # Danach alle Passwörter, Domains, Ports & Secrets im neuen .env anpassen
    ```
 
+   > **Appsmith-Hinweis:** Setze `APPSMITH_CUSTOM_DOMAIN` und `APPSMITH_COOKIE_DOMAIN` auf die Domain, unter der du WebOwie erreichst (z. B. `example.com`). Verwende außerdem eigene Werte für `APPSMITH_ENCRYPTION_PASSWORD` und `APPSMITH_ENCRYPTION_SALT`, damit sich der Login-Bildschirm korrekt initialisiert.
+
 2. **Container bauen und starten**
    ```bash
    docker compose pull
