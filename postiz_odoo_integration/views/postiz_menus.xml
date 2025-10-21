@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_postiz_root" name="Postiz" sequence="10" parent="base.menu_marketing" groups="postiz_odoo_integration.group_postiz_user"/>
+
+    <menuitem id="menu_postiz_workspaces" name="Workspaces" parent="menu_postiz_root" sequence="10" action="action_postiz_social_workspace"/>
+    <menuitem id="menu_postiz_posts" name="Posts" parent="menu_postiz_root" sequence="20" action="action_postiz_social_post"/>
+    <menuitem id="menu_postiz_accounts" name="Accounts" parent="menu_postiz_root" sequence="30" action="action_postiz_social_account"/>
+    <menuitem id="menu_postiz_platforms" name="Platforms" parent="menu_postiz_root" sequence="40" action="action_postiz_social_platform" groups="postiz_odoo_integration.group_postiz_manager"/>
+    <menuitem id="menu_postiz_metrics" name="Analytics" parent="menu_postiz_root" sequence="50" action="action_postiz_social_metric"/>
+</odoo>

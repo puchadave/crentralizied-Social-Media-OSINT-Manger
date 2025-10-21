@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="postiz_platform_facebook" model="postiz.social.platform">
+        <field name="name">Facebook</field>
+        <field name="technical_name">facebook</field>
+        <field name="base_url">https://graph.facebook.com/v16.0</field>
+        <field name="documentation_url">https://developers.facebook.com/docs/graph-api/</field>
+        <field name="scope">pages_manage_posts pages_read_engagement</field>
+        <field name="icon_html">&lt;i class="fa fa-facebook"/&gt;</field>
+    </record>
+    <record id="postiz_platform_instagram" model="postiz.social.platform">
+        <field name="name">Instagram</field>
+        <field name="technical_name">instagram</field>
+        <field name="base_url">https://graph.facebook.com/v16.0</field>
+        <field name="documentation_url">https://developers.facebook.com/docs/instagram-api</field>
+        <field name="scope">instagram_basic instagram_content_publish</field>
+        <field name="icon_html">&lt;i class="fa fa-instagram"/&gt;</field>
+    </record>
+    <record id="postiz_platform_linkedin" model="postiz.social.platform">
+        <field name="name">LinkedIn</field>
+        <field name="technical_name">linkedin</field>
+        <field name="base_url">https://api.linkedin.com/v2</field>
+        <field name="documentation_url">https://learn.microsoft.com/linkedin/</field>
+        <field name="scope">r_liteprofile w_member_social w_organization_social</field>
+        <field name="icon_html">&lt;i class="fa fa-linkedin"/&gt;</field>
+    </record>
+    <record id="postiz_platform_twitter" model="postiz.social.platform">
+        <field name="name">X (Twitter)</field>
+        <field name="technical_name">twitter</field>
+        <field name="base_url">https://api.twitter.com/2</field>
+        <field name="documentation_url">https://developer.twitter.com/en/docs</field>
+        <field name="scope">tweet.read tweet.write users.read</field>
+        <field name="icon_html">&lt;i class="fa fa-twitter"/&gt;</field>
+    </record>
+    <record id="postiz_platform_tiktok" model="postiz.social.platform">
+        <field name="name">TikTok</field>
+        <field name="technical_name">tiktok</field>
+        <field name="base_url">https://business-api.tiktok.com/open_api</field>
+        <field name="documentation_url">https://ads.tiktok.com/marketing_api/docs</field>
+        <field name="scope">video.publish analytics.read</field>
+        <field name="icon_html">&lt;i class="fa fa-music"/&gt;</field>
+    </record>
+    <record id="postiz_platform_youtube" model="postiz.social.platform">
+        <field name="name">YouTube</field>
+        <field name="technical_name">youtube</field>
+        <field name="base_url">https://www.googleapis.com/youtube/v3</field>
+        <field name="documentation_url">https://developers.google.com/youtube</field>
+        <field name="scope">youtube.upload youtube.readonly</field>
+        <field name="icon_html">&lt;i class="fa fa-youtube"/&gt;</field>
+    </record>
+    <record id="postiz_platform_pinterest" model="postiz.social.platform">
+        <field name="name">Pinterest</field>
+        <field name="technical_name">pinterest</field>
+        <field name="base_url">https://api.pinterest.com/v5</field>
+        <field name="documentation_url">https://developers.pinterest.com/docs/api/v5</field>
+        <field name="scope">boards:read pins:read pins:write</field>
+        <field name="icon_html">&lt;i class="fa fa-pinterest"/&gt;</field>
+    </record>
+    <record id="postiz_platform_mastodon" model="postiz.social.platform">
+        <field name="name">Mastodon</field>
+        <field name="technical_name">mastodon</field>
+        <field name="base_url">https://mastodon.social/api/v1</field>
+        <field name="documentation_url">https://docs.joinmastodon.org/client/</field>
+        <field name="scope">read write follow</field>
+        <field name="icon_html">&lt;i class="fa fa-rocket"/&gt;</field>
+    </record>
+</odoo>

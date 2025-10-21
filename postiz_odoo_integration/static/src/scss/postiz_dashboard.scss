@@ -1,0 +1,24 @@
+.o_postiz_kanban_badge {
+    border-radius: 12px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #4e73df;
+    color: #ffffff;
+}
+
+.o_postiz_post_state_draft {
+    background-color: #95a5a6;
+}
+
+.o_postiz_post_state_scheduled {
+    background-color: #1cc88a;
+}
+
+.o_postiz_post_state_failed {
+    background-color: #e74a3b;
+}
+
+.o_postiz_post_state_published {
+    background-color: #36b9cc;
+}

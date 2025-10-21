@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_postiz_social_workspace_tree" model="ir.ui.view">
+        <field name="name">postiz.social.workspace.tree</field>
+        <field name="model">postiz.social.workspace</field>
+        <field name="arch" type="xml">
+            <tree string="Workspaces" default_order="name">
+                <field name="name"/>
+                <field name="manager_id"/>
+                <field name="default_timezone"/>
+                <field name="approval_required"/>
+                <field name="post_count" widget="statinfo" string="Posts"/>
+                <field name="account_count" widget="statinfo" string="Accounts"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_postiz_social_workspace_form" model="ir.ui.view">
+        <field name="name">postiz.social.workspace.form</field>
+        <field name="model">postiz.social.workspace</field>
+        <field name="arch" type="xml">
+            <form string="Workspace">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_accounts" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="account_count" widget="statinfo" string="Accounts"/>
+                        </button>
+                        <button name="action_view_posts" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field name="post_count" widget="statinfo" string="Posts"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="manager_id"/>
+                            <field name="member_ids" widget="many2many_tags"/>
+                            <field name="approval_required"/>
+                        </group>
+                        <group>
+                            <field name="default_timezone"/>
+                            <field name="color" widget="color"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" nolabel="1" widget="html"/>
+                        </page>
+                        <page string="Chatter">
+                            <field name="message_follower_ids" widget="mail_followers"/>
+                            <field name="activity_ids" widget="mail_activity"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_postiz_social_workspace" model="ir.actions.act_window">
+        <field name="name">Workspaces</field>
+        <field name="res_model">postiz.social.workspace</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"default_manager_id": uid}</field>
+    </record>
+</odoo>
