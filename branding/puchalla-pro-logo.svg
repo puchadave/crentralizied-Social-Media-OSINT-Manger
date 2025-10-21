@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">puchalla.pro Logo</title>
+  <desc id="desc">Stylised monogram logo for puchalla.pro with modern sans-serif wordmark.</desc>
+  <defs>
+    <linearGradient id="shadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0a0a"/>
+      <stop offset="1" stop-color="#000"/>
+    </linearGradient>
+    <clipPath id="icon-clip">
+      <rect x="256" y="176" width="512" height="512" rx="64" ry="64"/>
+    </clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="#000"/>
+  <g clip-path="url(#icon-clip)">
+    <rect x="256" y="176" width="512" height="512" fill="url(#shadow)" opacity="0.45"/>
+  </g>
+  <path fill="#fff" d="M320 208h272c119.394 0 216 96.606 216 216s-96.606 216-216 216H464v176H320V208Zm144 144v144h128c39.765 0 72-32.235 72-72s-32.235-72-72-72H464Z"/>
+  <path fill="#fff" d="M576 208h128v432H576z"/>
+  <text x="512" y="872" text-anchor="middle" fill="#fff" font-family="'Montserrat', 'Poppins', 'Helvetica Neue', Arial, sans-serif" font-size="96" font-weight="600" letter-spacing="1.5">
+    puchalla.pro
+  </text>
+</svg>
