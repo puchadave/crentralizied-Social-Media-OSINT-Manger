@@ -18,9 +18,9 @@ The Centralized Social Media OSINT Manager orchestrates open-source intelligence
 
 ## Architecture Overview
 ```
-+---------------------+          +--------------------+
-|  Web Frontend (UI)  | <------> |  Backend API Gate  |
-+---------------------+          +--------------------+
++---------------------+          +---------------------------+
+|  Web Frontend (UI)  | <------> |  Backend API Gateway/API  |
++---------------------+          +---------------------------+
              ^                               |
              | GraphQL/REST                  |
              |                               v
@@ -131,6 +131,28 @@ NEXT_PUBLIC_MAPS_TOKEN=pk.ey...
    cd frontend
    npm run dev -- --host 0.0.0.0 --port 3000
    ```
+
+## Running & Verification
+- **Smoke test the backend** once the API is live:
+  ```bash
+  curl http://localhost:8000/healthz
+  ```
+  Expect an `HTTP/200` response indicating the service is ready.
+- **Execute backend unit tests** (if tests are present):
+  ```bash
+  pytest
+  ```
+- **Run frontend checks** after installing dependencies:
+  ```bash
+  npm test           # Component/unit tests
+  npm run lint       # ESLint rules
+  npm run typecheck  # TypeScript validation
+  ```
+- **Inspect worker logs** by tailing process output:
+  ```bash
+  tail -f logs/crawler.log
+  ```
+
 
 ## Usage Examples
 ### 1. Campaign Setup & Monitoring
