@@ -1,0 +1,189 @@
+{
+  "title": "Marketing Stack",
+  "welcome": "Willkommen im zentralen Marketing-Dashboard",
+  "language": "de",
+  "theme": "default",
+  "search": {
+    "provider": "duckduckgo",
+    "url": "https://duckduckgo.com/?q="
+  },
+  "tags": [],
+  "categories": [
+    { "id": 1, "name": "Analytics", "order": 1 },
+    { "id": 2, "name": "Automation", "order": 2 },
+    { "id": 3, "name": "Kommunikation", "order": 3 },
+    { "id": 4, "name": "Security", "order": 4 },
+    { "id": 5, "name": "Data", "order": 5 },
+    { "id": 6, "name": "KI", "order": 6 }
+  ],
+  "apps": [
+    {
+      "id": 1,
+      "name": "Matomo",
+      "type": "matomo",
+      "icon": "matomo",
+      "color": "blue",
+      "url": "http://localhost:8080",
+      "category": "Analytics",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "Web Analytics"
+    },
+    {
+      "id": 2,
+      "name": "Listmonk",
+      "type": "listmonk",
+      "icon": "listmonk",
+      "color": "green",
+      "url": "http://localhost:9000",
+      "category": "Kommunikation",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "Newsletter & Kampagnen"
+    },
+    {
+      "id": 3,
+      "name": "SEO Panel",
+      "type": "generic",
+      "icon": "seo",
+      "color": "orange",
+      "url": "http://localhost:8081",
+      "category": "Analytics",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "SEO Monitoring"
+    },
+    {
+      "id": 4,
+      "name": "Open WebUI",
+      "type": "generic",
+      "icon": "mdi-web",
+      "color": "purple",
+      "url": "http://localhost:3000",
+      "category": "KI",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "LLM Interface"
+    },
+    {
+      "id": 5,
+      "name": "n8n",
+      "type": "n8n",
+      "icon": "n8n",
+      "color": "teal",
+      "url": "http://localhost:5678",
+      "category": "Automation",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "Automationsplattform"
+    },
+    {
+      "id": 6,
+      "name": "Metabase",
+      "type": "metabase",
+      "icon": "metabase",
+      "color": "indigo",
+      "url": "http://localhost:3001",
+      "category": "Data",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "BI & Dashboards"
+    },
+    {
+      "id": 7,
+      "name": "Mautic",
+      "type": "mautic",
+      "icon": "mautic",
+      "color": "deep-purple",
+      "url": "http://localhost:8082",
+      "category": "Automation",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "Marketing Automation"
+    },
+    {
+      "id": 8,
+      "name": "Keycloak",
+      "type": "keycloak",
+      "icon": "keycloak",
+      "color": "brown",
+      "url": "http://localhost:8083",
+      "category": "Security",
+      "order": 1,
+      "target": "_self",
+      "subtitle": "Identity & Access"
+    },
+    {
+      "id": 9,
+      "name": "OpenSearch Dashboards",
+      "type": "opensearch",
+      "icon": "opensearch",
+      "color": "cyan",
+      "url": "http://localhost:5601",
+      "category": "Analytics",
+      "order": 3,
+      "target": "_self",
+      "subtitle": "Such- & Log-Analysen"
+    },
+    {
+      "id": 10,
+      "name": "SpiderFoot",
+      "type": "generic",
+      "icon": "spider",
+      "color": "red",
+      "url": "http://localhost:5001",
+      "category": "Security",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "OSINT Automatisierung"
+    },
+    {
+      "id": 11,
+      "name": "Ollama",
+      "type": "generic",
+      "icon": "mdi-robot",
+      "color": "grey",
+      "url": "http://localhost:11434",
+      "category": "KI",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "Lokale Modelle"
+    },
+    {
+      "id": 12,
+      "name": "OpenSearch API",
+      "type": "opensearch",
+      "icon": "opensearch",
+      "color": "light-blue",
+      "url": "http://localhost:9200",
+      "category": "Data",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "REST Schnittstelle"
+    },
+    {
+      "id": 13,
+      "name": "Postiz",
+      "type": "generic",
+      "icon": "mdi-send",
+      "color": "pink",
+      "url": "http://localhost:3002",
+      "category": "Kommunikation",
+      "order": 2,
+      "target": "_self",
+      "subtitle": "Social Media Scheduler"
+    },
+    {
+      "id": 14,
+      "name": "Redis Commander",
+      "type": "generic",
+      "icon": "redis",
+      "color": "red",
+      "url": "redis://localhost:6379",
+      "category": "Data",
+      "order": 3,
+      "target": "_self",
+      "subtitle": "Redis Dienst"
+    }
+  ]
+}
