@@ -1,0 +1,347 @@
+version: "3.9"
+
+services:
+  matomo:
+    image: matomo:4-apache
+    container_name: matomo
+    depends_on:
+      - matomo-db
+    environment:
+      MATOMO_DATABASE_HOST: matomo-db
+      MATOMO_DATABASE_ADAPTER: mysql
+      MATOMO_DATABASE_TABLES_PREFIX: matomo_
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: matomo_secret
+      MATOMO_DATABASE_DBNAME: matomo
+    volumes:
+      - matomo_data:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - marketing-net
+
+  matomo-db:
+    image: mariadb:10.6
+    container_name: matomo-db
+    command: ["--max-allowed-packet=64M", "--innodb-log-file-size=256M"]
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: matomo
+      MYSQL_USER: matomo
+      MYSQL_PASSWORD: matomo_secret
+    volumes:
+      - matomo_db_data:/var/lib/mysql
+    networks:
+      - marketing-net
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: listmonk
+    depends_on:
+      - listmonk-db
+    environment:
+      LISTMONK_app__address: 0.0.0.0:9000
+      LISTMONK_db__host: listmonk-db
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: listmonk
+      LISTMONK_db__password: listmonk_secret
+      LISTMONK_db__database: listmonk
+    command: ["sh", "-c", "./listmonk --install --yes && ./listmonk"]
+    volumes:
+      - listmonk_data:/listmonk/uploads
+    ports:
+      - "9000:9000"
+    networks:
+      - marketing-net
+
+  listmonk-db:
+    image: postgres:15
+    container_name: listmonk-db
+    environment:
+      POSTGRES_DB: listmonk
+      POSTGRES_USER: listmonk
+      POSTGRES_PASSWORD: listmonk_secret
+    volumes:
+      - listmonk_db_data:/var/lib/postgresql/data
+    networks:
+      - marketing-net
+
+  seo-panel:
+    image: ferdi265/seopanel:latest
+    container_name: seo-panel
+    environment:
+      DB_HOST: seo-panel-db
+      DB_NAME: seopanel
+      DB_USER: seopanel
+      DB_PASSWORD: seopanel_secret
+    depends_on:
+      - seo-panel-db
+    ports:
+      - "8081:80"
+    volumes:
+      - seopanel_data:/var/www/html/config
+    networks:
+      - marketing-net
+
+  seo-panel-db:
+    image: mariadb:10.6
+    container_name: seo-panel-db
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: seopanel
+      MYSQL_USER: seopanel
+      MYSQL_PASSWORD: seopanel_secret
+    volumes:
+      - seopanel_db_data:/var/lib/mysql
+    networks:
+      - marketing-net
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      WEBUI_AUTH: "false"
+    volumes:
+      - open_webui_data:/app/backend/data
+    ports:
+      - "3000:8080"
+    networks:
+      - marketing-net
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: admin_secret
+      GENERIC_TIMEZONE: Europe/Berlin
+    volumes:
+      - n8n_data:/home/node/.n8n
+    ports:
+      - "5678:5678"
+    networks:
+      - marketing-net
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+    volumes:
+      - metabase_data:/metabase-data
+    ports:
+      - "3001:3000"
+    networks:
+      - marketing-net
+
+  mautic:
+    image: mautic/mautic:latest
+    container_name: mautic
+    depends_on:
+      - mautic-db
+    environment:
+      MAUTIC_DB_HOST: mautic-db
+      MAUTIC_DB_NAME: mautic
+      MAUTIC_DB_USER: mautic
+      MAUTIC_DB_PASSWORD: mautic_secret
+      MAUTIC_RUN_CRON_JOBS: "true"
+    volumes:
+      - mautic_data:/var/www/html
+    ports:
+      - "8082:80"
+    networks:
+      - marketing-net
+
+  mautic-db:
+    image: mariadb:10.6
+    container_name: mautic-db
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: mautic
+      MYSQL_USER: mautic
+      MYSQL_PASSWORD: mautic_secret
+    volumes:
+      - mautic_db_data:/var/lib/mysql
+    networks:
+      - marketing-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    depends_on:
+      - keycloak-db
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin_secret
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_secret
+    command:
+      - start
+      - --http-port=8080
+      - --hostname-strict=false
+      - --hostname-strict-https=false
+    ports:
+      - "8083:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - marketing-net
+
+  keycloak-db:
+    image: postgres:15
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak_secret
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    networks:
+      - marketing-net
+
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    container_name: opensearch
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    networks:
+      - marketing-net
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.13.0
+    container_name: opensearch-dashboards
+    depends_on:
+      - opensearch
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+    ports:
+      - "5601:5601"
+    volumes:
+      - opensearch_dashboards_data:/usr/share/opensearch-dashboards/data
+    networks:
+      - marketing-net
+
+  redis:
+    image: redis:7
+    container_name: redis
+    command: ["redis-server", "--save", "20", "1", "--loglevel", "warning"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - marketing-net
+
+  spiderfoot:
+    image: smicallef/spiderfoot:latest
+    container_name: spiderfoot
+    ports:
+      - "5001:5001"
+    volumes:
+      - spiderfoot_data:/home/spiderfoot/.spiderfoot
+    networks:
+      - marketing-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - marketing-net
+
+  postiz:
+    image: ghcr.io/postiz/postiz:latest
+    container_name: postiz
+    depends_on:
+      - postiz-db
+      - redis
+    environment:
+      POSTGRES_HOST: postiz-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: postiz
+      POSTGRES_PASSWORD: postiz_secret
+      POSTGRES_DB: postiz
+      REDIS_HOST: redis
+    ports:
+      - "3002:3000"
+    volumes:
+      - postiz_data:/app/storage
+    networks:
+      - marketing-net
+
+  postiz-db:
+    image: postgres:15
+    container_name: postiz-db
+    environment:
+      POSTGRES_DB: postiz
+      POSTGRES_USER: postiz
+      POSTGRES_PASSWORD: postiz_secret
+    volumes:
+      - postiz_db_data:/var/lib/postgresql/data
+    networks:
+      - marketing-net
+
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: Europe/Berlin
+    volumes:
+      - heimdall_config:/config
+      - ./config/heimdall/config.json:/config/www/assets/data/config.json:ro
+    ports:
+      - "8084:80"
+      - "8443:443"
+    networks:
+      - marketing-net
+
+volumes:
+  matomo_data:
+  matomo_db_data:
+  listmonk_data:
+  listmonk_db_data:
+  seopanel_data:
+  seopanel_db_data:
+  open_webui_data:
+  n8n_data:
+  metabase_data:
+  mautic_data:
+  mautic_db_data:
+  keycloak_data:
+  keycloak_db_data:
+  opensearch_data:
+  opensearch_dashboards_data:
+  redis_data:
+  spiderfoot_data:
+  ollama_data:
+  postiz_data:
+  postiz_db_data:
+  heimdall_config:
+
+networks:
+  marketing-net:
+    driver: bridge
