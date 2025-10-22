@@ -16,7 +16,19 @@ class WebMetricBase(SQLModel):
     value: float = Field(description="Aggregierter Wert für das Zeitfenster.")
     period_start: datetime = Field(description="Beginn des Messzeitraums.")
     period_end: datetime = Field(description="Ende des Messzeitraums.")
-    metadata: Dict[str, str] = Field(default_factory=dict, sa_column=Column(JSON))
+    metadata_: Dict[str, str] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        alias="metadata",
+    )
+
+    @property
+    def metadata(self) -> Dict[str, str]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, str]) -> None:
+        self.metadata_ = value
 
 
 class WebMetric(WebMetricBase, table=True):
@@ -41,7 +53,19 @@ class SearchMetricBase(SQLModel):
     position: float = Field(description="Durchschnittliche Position.")
     period_start: datetime = Field()
     period_end: datetime = Field()
-    metadata: Dict[str, str] = Field(default_factory=dict, sa_column=Column(JSON))
+    metadata_: Dict[str, str] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        alias="metadata",
+    )
+
+    @property
+    def metadata(self) -> Dict[str, str]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, str]) -> None:
+        self.metadata_ = value
 
 
 class SearchMetric(SearchMetricBase, table=True):

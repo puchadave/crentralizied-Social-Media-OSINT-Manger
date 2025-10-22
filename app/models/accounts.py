@@ -63,12 +63,23 @@ class SiteBase(SQLModel):
         description="Aktivierte Integrationen wie Analytics, Ads, Search Console.",
         sa_column=Column(JSON),
     )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Zusätzliche Konfigurationsparameter.", sa_column=Column(JSON)
+    metadata_: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Zusätzliche Konfigurationsparameter.",
+        sa_column=Column(JSON),
+        alias="metadata",
     )
     last_synced_at: Optional[datetime] = Field(
         default=None, description="Letzte erfolgreiche Synchronisierung über APIs."
     )
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, Any]) -> None:
+        self.metadata_ = value
 
 
 class Site(SiteBase, table=True):
@@ -140,7 +151,19 @@ class InvoiceBase(SQLModel):
         description="Aufgeschlüsselte Positionen der Rechnung.",
         sa_column=Column(JSON),
     )
-    metadata: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    metadata_: Dict[str, Any] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        alias="metadata",
+    )
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, Any]) -> None:
+        self.metadata_ = value
 
 
 class Invoice(InvoiceBase, table=True):
@@ -179,7 +202,19 @@ class ProposalBase(SQLModel):
         default_factory=lambda: datetime.utcnow() + timedelta(days=30),
         description="Gültigkeitszeitraum des Angebots.",
     )
-    metadata: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    metadata_: Dict[str, Any] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        alias="metadata",
+    )
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, Any]) -> None:
+        self.metadata_ = value
 
 
 class Proposal(ProposalBase, table=True):

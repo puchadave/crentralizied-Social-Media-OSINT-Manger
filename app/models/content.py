@@ -5,28 +5,42 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.sqlite import JSON
-from sqlmodel import Field, SQLModel
-from pydantic import BaseModel, Field
+from sqlmodel import Field as SQLField, SQLModel
+from pydantic import BaseModel, Field as PydanticField
 
 
 class ContentItemBase(SQLModel):
-    channel: str = Field(description="Target channel such as twitter, linkedin, blog, etc.")
-    title: str = Field(description="Internal title for the content asset.")
-    body: str = Field(description="Primary content body or caption.")
-    language: str = Field(default="de", description="Language of the content.")
-    tags: List[str] = Field(default_factory=list, sa_column=Column(JSON))
-    status: str = Field(
+    channel: str = SQLField(description="Target channel such as twitter, linkedin, blog, etc.")
+    title: str = SQLField(description="Internal title for the content asset.")
+    body: str = SQLField(description="Primary content body or caption.")
+    language: str = SQLField(default="de", description="Language of the content.")
+    tags: List[str] = SQLField(default_factory=list, sa_column=Column(JSON))
+    status: str = SQLField(
         default="draft",
         description="Workflow status (draft, scheduled, published, archived).",
     )
-    scheduled_for: Optional[datetime] = Field(default=None, description="Planned publication time.")
-    metadata: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    scheduled_for: Optional[datetime] = SQLField(
+        default=None, description="Planned publication time."
+    )
+    metadata_: Dict[str, Any] = SQLField(
+        default_factory=dict,
+        alias="metadata",
+        sa_column=Column(JSON),
+    )
+
+    @property
+    def metadata(self) -> Dict[str, Any]:
+        return self.metadata_
+
+    @metadata.setter
+    def metadata(self, value: Dict[str, Any]) -> None:
+        self.metadata_ = value
 
 
 class ContentItem(ContentItemBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    id: Optional[int] = SQLField(default=None, primary_key=True)
+    created_at: datetime = SQLField(default_factory=datetime.utcnow)
+    updated_at: datetime = SQLField(default_factory=datetime.utcnow)
 
 
 class ContentItemCreate(ContentItemBase):
@@ -43,7 +57,7 @@ class DispatchStatus(BaseModel):
     status: str
     reference: str
     delivered_at: datetime
-    features: List[str] = Field(default_factory=list)
+    features: List[str] = PydanticField(default_factory=list)
     metadata_applied: Optional[int] = None
 
 
