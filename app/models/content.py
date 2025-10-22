@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.sqlite import JSON
 from sqlmodel import Field, SQLModel
+from pydantic import BaseModel, Field
 
 
 class ContentItemBase(SQLModel):
@@ -19,7 +20,7 @@ class ContentItemBase(SQLModel):
         description="Workflow status (draft, scheduled, published, archived).",
     )
     scheduled_for: Optional[datetime] = Field(default=None, description="Planned publication time.")
-    metadata: Dict[str, str] = Field(default_factory=dict, sa_column=Column(JSON))
+    metadata: Dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
 
 class ContentItem(ContentItemBase, table=True):
@@ -36,3 +37,16 @@ class ContentItemRead(ContentItemBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class DispatchStatus(BaseModel):
+    status: str
+    reference: str
+    delivered_at: datetime
+    features: List[str] = Field(default_factory=list)
+    metadata_applied: Optional[int] = None
+
+
+class ContentDispatchResponse(BaseModel):
+    item: ContentItemRead
+    destinations: Dict[str, DispatchStatus]

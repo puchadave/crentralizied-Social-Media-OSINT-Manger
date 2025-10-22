@@ -10,10 +10,13 @@ Metadaten für gängige CMS-Plattformen und bietet automatisierte Playbooks für
   Tag-Analyse.
 - **SEO Intelligence**: On-Demand On-Page-Checks mit Meta-Optimierung und CMS-Bridges
   für WordPress, Ghost und Odoo.
-- **Content Hub**: Zentrale Content-Bibliothek, KI-generierte Captions und Status-Workflows.
+- **Content Hub**: Zentrale Content-Bibliothek, KI-generierte Captions, Zielnetzwerk-Übersicht
+  und KI-gesteuertes Multi-Publishing.
 - **Marketing Insights**: Automatisierte Empfehlungen für Posting-Zeitpunkte und
   Kampagnen-Health.
 - **Automatisierung**: Regel-Engine, die auf OSINT- oder SEO-Ereignisse reagiert.
+- **Analytics Hub**: Vollwertiger Ersatz für Google Analytics & Search Console mit KPIs,
+  Traffic-Breakdown und Echtzeit-Engagement.
 - **Visualisierung**: Aggregationen zu Mention-Volumen und Sentiment-Verläufen je Plattform.
 
 ## Architektur
@@ -21,9 +24,10 @@ Metadaten für gängige CMS-Plattformen und bietet automatisierte Playbooks für
 ```
 FastAPI (REST & WebSocket)
 ├── Routers: /osint, /seo, /content, /automation, /analytics
-├── Services: OSINTStream, SEOOptimizer, MarketingOptimizer, ContentHub, AutomationEngine
+├── Services: OSINTStream, SEOOptimizer, MarketingOptimizer, ContentHub,
+│            SocialNetworkRouter, Dashboard Analytics, AutomationEngine
 ├── CMS-Connectoren: WordPress, Ghost, Odoo (API-basiert)
-└── SQLModel + SQLite: Persistenzschicht für Events, Content, SEO-Reports und Regeln
+└── SQLModel + SQLite: Persistenzschicht für Events, Content, Analytics, SEO-Reports und Regeln
 ```
 
 ## Schnellstart
@@ -44,7 +48,12 @@ Nach dem Start stehen folgende Komponenten zur Verfügung:
 - `POST /seo/metadata` – Metadaten speichern und optional Richtung CMS pushen
 - `GET /content/` – Content-Repository
 - `POST /content/generate` – KI-gestützte Content-Erstellung
-- `GET /analytics/overview` – Visualisierte KPI-Aggregation
+- `GET /content/destinations` – verfügbare Social & CMS Connectors
+- `POST /content/{id}/publish` – KI-Dispatch zu mehreren Netzwerken
+- `GET /analytics/overview` – Echtzeit-Dashboard mit KPIs & OSINT
+- `GET /analytics/search-console` – Keywords, Klicks, CTR & Positionen
+- `GET /analytics/traffic` – Traffic-Breakdown je Quelle
+- `GET /analytics/engagement` – 24h-Engagement-Radar
 
 Demo-Daten werden beim Start automatisch erzeugt (`Settings.enable_demo_data`).
 

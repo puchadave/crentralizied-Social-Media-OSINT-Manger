@@ -1,7 +1,20 @@
 """Database models and API schemas."""
 
+from .analytics import (
+    SearchMetric,
+    SearchMetricCreate,
+    SearchMetricRead,
+    WebMetric,
+    WebMetricCreate,
+    WebMetricRead,
+)
 from .automation import AutomationRule, AutomationRuleCreate, AutomationRuleRead
-from .content import ContentItem, ContentItemCreate, ContentItemRead
+from .content import (
+    ContentDispatchResponse,
+    ContentItem,
+    ContentItemCreate,
+    ContentItemRead,
+)
 from .osint import OSINTEvent, OSINTEventCreate, OSINTEventRead, OSINTSummary
 from .seo import MetadataPatch, SEOReport, SEOReportCreate, SEOReportRead
 
@@ -12,6 +25,7 @@ __all__ = [
     "ContentItem",
     "ContentItemCreate",
     "ContentItemRead",
+    "ContentDispatchResponse",
     "OSINTEvent",
     "OSINTEventCreate",
     "OSINTEventRead",
@@ -20,4 +34,10 @@ __all__ = [
     "SEOReport",
     "SEOReportCreate",
     "SEOReportRead",
+    "WebMetric",
+    "WebMetricCreate",
+    "WebMetricRead",
+    "SearchMetric",
+    "SearchMetricCreate",
+    "SearchMetricRead",
 ]

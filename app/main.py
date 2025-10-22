@@ -9,7 +9,7 @@ from sqlmodel import select
 
 from .config import settings
 from .database import init_db, session_scope
-from .models import ContentItem, OSINTEvent, OSINTEventCreate
+from .models import ContentItem, OSINTEvent, OSINTEventCreate, SearchMetric, WebMetric
 from .routers import analytics, automation, content, osint, seo
 from .services import nlp, osint_stream
 
@@ -60,6 +60,48 @@ async def seed_demo_data() -> None:
                 status="published",
             )
             session.add(item)
+        session.commit()
+
+        window_end = datetime.utcnow()
+        window_start = window_end - timedelta(hours=1)
+        for source, metric, value in [
+            ("website", "sessions", 1860.0),
+            ("website", "pageviews", 4320.0),
+            ("website", "conversions", 148.0),
+            ("website", "bounce_rate", 36.0),
+            ("website", "session_duration_seconds", 212.0),
+            ("landingpage", "sessions", 640.0),
+        ]:
+            session.add(
+                WebMetric(
+                    source=source,
+                    metric=metric,
+                    value=value,
+                    period_start=window_start,
+                    period_end=window_end,
+                    metadata={"seed": "demo"},
+                )
+            )
+
+        search_window_start = window_end - timedelta(days=1)
+        for query, clicks, impressions, ctr, position in [
+            ("osint marketing", 320.0, 6400.0, 5.0, 3.2),
+            ("realtime seo", 210.0, 3900.0, 5.4, 4.1),
+            ("automation dashboard", 140.0, 2600.0, 5.3, 5.0),
+        ]:
+            session.add(
+                SearchMetric(
+                    query=query,
+                    clicks=clicks,
+                    impressions=impressions,
+                    ctr=ctr,
+                    position=position,
+                    period_start=search_window_start,
+                    period_end=window_end,
+                    metadata={"seed": "demo"},
+                )
+            )
+
         session.commit()
 
 
