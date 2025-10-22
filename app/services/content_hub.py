@@ -52,12 +52,12 @@ class ContentHub:
         statuses = self.router.publish(item, networks)
         if not statuses:
             raise ValueError("No supported networks requested")
-        metadata = item.metadata or {}
-        destinations: Dict[str, Dict[str, str]] = metadata.get("destinations", {})
+        metadata = dict(item.metadata_ or {})
+        destinations: Dict[str, Dict[str, str]] = dict(metadata.get("destinations", {}))
         destinations.update(statuses)
         metadata["destinations"] = destinations
         metadata["last_dispatch"] = datetime.utcnow().isoformat()
-        item.metadata = metadata
+        item.metadata_ = metadata
         item.status = "published"
         item.updated_at = datetime.utcnow()
         self.session.add(item)

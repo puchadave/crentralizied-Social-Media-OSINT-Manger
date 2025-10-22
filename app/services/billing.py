@@ -79,7 +79,9 @@ class BillingEngine:
             raise ValueError("Rechnung nicht gefunden")
         invoice.status = status
         if status == "paid":
-            invoice.metadata.update({"paid_at": datetime.utcnow().isoformat()})
+            metadata = dict(invoice.metadata_ or {})
+            metadata["paid_at"] = datetime.utcnow().isoformat()
+            invoice.metadata_ = metadata
         self.session.add(invoice)
         self.session.commit()
         self.session.refresh(invoice)

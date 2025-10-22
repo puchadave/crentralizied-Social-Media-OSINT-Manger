@@ -368,7 +368,7 @@ async def stream_demo_events() -> None:
         for payload in demo_events:
             normalised_text = nlp.normalise_text(payload.text)
             event = OSINTEvent(
-                **payload.dict(exclude={"text"}),
+                **payload.dict(exclude={"text", "sentiment", "tags"}),
                 text=normalised_text,
                 sentiment=nlp.sentiment_score(normalised_text),
                 tags=nlp.extract_tags(normalised_text),

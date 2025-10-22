@@ -73,14 +73,6 @@ class SiteBase(SQLModel):
         default=None, description="Letzte erfolgreiche Synchronisierung über APIs."
     )
 
-    @property
-    def metadata(self) -> Dict[str, Any]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, Any]) -> None:
-        self.metadata_ = value
-
 
 class Site(SiteBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -157,14 +149,6 @@ class InvoiceBase(SQLModel):
         alias="metadata",
     )
 
-    @property
-    def metadata(self) -> Dict[str, Any]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, Any]) -> None:
-        self.metadata_ = value
-
 
 class Invoice(InvoiceBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -207,14 +191,6 @@ class ProposalBase(SQLModel):
         sa_column=Column(JSON),
         alias="metadata",
     )
-
-    @property
-    def metadata(self) -> Dict[str, Any]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, Any]) -> None:
-        self.metadata_ = value
 
 
 class Proposal(ProposalBase, table=True):

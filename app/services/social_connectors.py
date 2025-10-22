@@ -23,8 +23,8 @@ class ConnectorProfile:
             "reference": reference,
             "delivered_at": timestamp,
         }
-        if self.supports_metadata and item.metadata:
-            status["metadata_applied"] = len(item.metadata)
+        if self.supports_metadata and item.metadata_:
+            status["metadata_applied"] = len(item.metadata_)
         status["features"] = self.features
         return status
 

@@ -28,14 +28,6 @@ class ContentItemBase(SQLModel):
         sa_column=Column(JSON),
     )
 
-    @property
-    def metadata(self) -> Dict[str, Any]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, Any]) -> None:
-        self.metadata_ = value
-
 
 class ContentItem(ContentItemBase, table=True):
     id: Optional[int] = SQLField(default=None, primary_key=True)

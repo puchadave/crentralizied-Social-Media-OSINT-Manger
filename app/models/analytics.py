@@ -22,14 +22,6 @@ class WebMetricBase(SQLModel):
         alias="metadata",
     )
 
-    @property
-    def metadata(self) -> Dict[str, str]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, str]) -> None:
-        self.metadata_ = value
-
 
 class WebMetric(WebMetricBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -58,14 +50,6 @@ class SearchMetricBase(SQLModel):
         sa_column=Column(JSON),
         alias="metadata",
     )
-
-    @property
-    def metadata(self) -> Dict[str, str]:
-        return self.metadata_
-
-    @metadata.setter
-    def metadata(self, value: Dict[str, str]) -> None:
-        self.metadata_ = value
 
 
 class SearchMetric(SearchMetricBase, table=True):
