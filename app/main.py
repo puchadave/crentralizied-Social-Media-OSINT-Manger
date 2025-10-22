@@ -9,6 +9,7 @@ from sqlmodel import select
 
 from .config import settings
 from .database import init_db, session_scope
+from .frontend import router as frontend_router
 from .models import (
     BudgetAllocation,
     Client,
@@ -27,6 +28,7 @@ from .services import nlp, osint_stream
 
 def create_application() -> FastAPI:
     app = FastAPI(title="Realtime Social Media Marketing OSINT Manager", version="0.1.0")
+    app.include_router(frontend_router)
     app.include_router(osint.router)
     app.include_router(seo.router)
     app.include_router(content.router)

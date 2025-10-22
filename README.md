@@ -19,7 +19,8 @@ Metadaten für gängige CMS-Plattformen und bietet automatisierte Playbooks für
   Traffic-Breakdown und Echtzeit-Engagement.
 - **Mandanten & Abrechnung**: Multi-Site- und Kundenverwaltung inkl. Google-Ads-Budgets,
   Rechnungslegung, KPI-Auswertung und KI-basierter Angebotskalkulation pro Minute.
-- **Visualisierung**: Aggregationen zu Mention-Volumen und Sentiment-Verläufen je Plattform.
+- **Visualisierung & Web-GUI**: Einseitiges Control-Center mit KPI-Cards, Live-OSINT-Stream,
+  Content Hub, Mandanten- und Billing-Workflow sowie SEO-Analyse.
 
 ## Architektur
 
@@ -43,7 +44,8 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Nach dem Start stehen folgende Komponenten zur Verfügung:
+Öffne anschließend `http://127.0.0.1:8000/` für die vollwertige Web-GUI. Die API bleibt
+parallel erreichbar – wichtige Endpunkte:
 
 - `GET /osint/events` – letzte OSINT-Events
 - `POST /osint/events` – neue Erwähnungen einspeisen
@@ -65,6 +67,21 @@ Nach dem Start stehen folgende Komponenten zur Verfügung:
 - `POST /billing/proposals/generate` – Automatische Angebotserstellung nach Minutenpreisen
 
 Demo-Daten werden beim Start automatisch erzeugt (`Settings.enable_demo_data`).
+
+### Web-GUI Überblick
+
+Die Oberfläche bündelt alle Workflows auf einer Seite:
+
+- **Analytics Board**: Sessions, Pageviews, Conversions, Bounce-Rate, Engagement sowie
+  Search-Console-Queries und Traffic-Quellen.
+- **OSINT Stream**: Live-Table mit WebSocket-Events, Sentiment, Engagement und Tagging.
+- **Content Hub**: KI-Themen-Generator, Status-Steuerung und Multi-Channel-Publishing.
+- **SEO & Metadata**: Ad-hoc-URL-Analyse samt Issue-/Recommendation-Liste und
+  Formular für Meta-Push in angebundene CMS.
+- **Mandantenverwaltung**: Anlage von Kunden & Sites inkl. Integrations-Setup und
+  zusammengefassten KPIs pro Mandant.
+- **Billing Center**: Budgetplanung, Spend-Tracking, Rechnungen, Angebotsgenerator und
+  Gesamtübersicht aller finanziellen Artefakte.
 
 ### Demo-Daten
 
@@ -89,6 +106,6 @@ Wichtige Parameter:
 
 - Live-Konnektoren zu Twitter, LinkedIn, Mastodon & Reddit.
 - Integration eines Message-Brokers (Kafka, Redis Streams) für Skalierung.
-- Dashboard-Frontend mit Echtzeit-Charts (z. B. Streamlit, Next.js).
+- Erweiterte Charting-Widgets (z. B. zusätzliche Diagramme, Drill-Downs) für die bestehende GUI.
 - Feinere AI-Modelle (OpenAI, HuggingFace) für Text- und Bild-Generierung.
 - Bidirektionale CMS-Synchronisation inkl. Publishing-Workflows.
