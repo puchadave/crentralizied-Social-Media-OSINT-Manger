@@ -9,8 +9,19 @@ from sqlmodel import select
 
 from .config import settings
 from .database import init_db, session_scope
-from .models import ContentItem, OSINTEvent, OSINTEventCreate, SearchMetric, WebMetric
-from .routers import analytics, automation, content, osint, seo
+from .models import (
+    BudgetAllocation,
+    Client,
+    ContentItem,
+    Invoice,
+    OSINTEvent,
+    OSINTEventCreate,
+    Proposal,
+    SearchMetric,
+    Site,
+    WebMetric,
+)
+from .routers import analytics, automation, billing, clients, content, osint, seo
 from .services import nlp, osint_stream
 
 
@@ -21,6 +32,8 @@ def create_application() -> FastAPI:
     app.include_router(content.router)
     app.include_router(automation.router)
     app.include_router(analytics.router)
+    app.include_router(clients.router)
+    app.include_router(billing.router)
 
     app.add_middleware(
         CORSMiddleware,
@@ -101,6 +114,224 @@ async def seed_demo_data() -> None:
                     metadata={"seed": "demo"},
                 )
             )
+
+        # Demo Kunden & Mandantenverwaltung
+        digital_growth = Client(
+            name="Digital Growth GmbH",
+            industry="SaaS",
+            contact_email="ops@digitalgrowth.example",
+            account_manager="Lena Analytics",
+            timezone="Europe/Berlin",
+            billing_rate_per_minute=2.8,
+            preferences={
+                "reporting_language": "de",
+                "preferred_channels": ["google_ads", "linkedin"],
+            },
+        )
+        session.add(digital_growth)
+        session.commit()
+        session.refresh(digital_growth)
+
+        ecom_sprint = Client(
+            name="Ecom Sprint AG",
+            industry="E-Commerce",
+            contact_email="commerce@ecomsprint.example",
+            account_manager="Mia Performance",
+            timezone="Europe/Berlin",
+            billing_rate_per_minute=2.1,
+            preferences={"reporting_language": "en", "preferred_channels": ["meta_ads"]},
+        )
+        session.add(ecom_sprint)
+        session.commit()
+        session.refresh(ecom_sprint)
+
+        digital_sites = [
+            Site(
+                client_id=digital_growth.id,
+                name="Corporate",
+                url="https://digitalgrowth.example",
+                platform="wordpress",
+                workspace="digitalgrowth",
+                api_connected=True,
+                connected_integrations=["analytics", "search_console", "google_ads"],
+                metadata={"audience": "b2b", "language": "de"},
+                last_synced_at=window_end,
+            ),
+            Site(
+                client_id=digital_growth.id,
+                name="Product Hub",
+                url="https://hub.digitalgrowth.example",
+                platform="ghost",
+                workspace="dg-products",
+                api_connected=True,
+                connected_integrations=["analytics", "seo", "automation"],
+                metadata={"audience": "product-led", "language": "en"},
+                last_synced_at=window_end,
+            ),
+        ]
+        for site in digital_sites:
+            session.add(site)
+        session.commit()
+        for site in digital_sites:
+            session.refresh(site)
+
+        ecom_site = Site(
+            client_id=ecom_sprint.id,
+            name="Storefront",
+            url="https://shop.ecomsprint.example",
+            platform="odoo",
+            workspace="ecom-shop",
+            api_connected=True,
+            connected_integrations=["analytics", "google_ads", "meta_ads"],
+            metadata={"audience": "d2c", "language": "de"},
+            last_synced_at=window_end,
+        )
+        session.add(ecom_site)
+        session.commit()
+        session.refresh(ecom_site)
+
+        # Budget- und Abrechnungssimulation
+        budgets = [
+            BudgetAllocation(
+                client_id=digital_growth.id,
+                site_id=digital_sites[0].id,
+                campaign_name="Brand Awareness Q1",
+                channel="google_ads",
+                currency="EUR",
+                allocated_budget=12000.0,
+                spent_budget=3400.0,
+                period_start=window_end - timedelta(days=15),
+                period_end=window_end + timedelta(days=15),
+                status="active",
+                kpi_target={"cpl": 45.0, "roas": 4.5},
+            ),
+            BudgetAllocation(
+                client_id=digital_growth.id,
+                site_id=digital_sites[1].id,
+                campaign_name="Product-Led SEO",
+                channel="seo",
+                currency="EUR",
+                allocated_budget=4800.0,
+                spent_budget=1600.0,
+                period_start=window_end - timedelta(days=30),
+                period_end=window_end + timedelta(days=30),
+                status="active",
+                kpi_target={"organic_sessions": 5000, "sqls": 120},
+            ),
+            BudgetAllocation(
+                client_id=ecom_sprint.id,
+                site_id=ecom_site.id,
+                campaign_name="Performance Max",
+                channel="google_ads",
+                currency="EUR",
+                allocated_budget=18000.0,
+                spent_budget=9600.0,
+                period_start=window_end - timedelta(days=10),
+                period_end=window_end + timedelta(days=20),
+                status="active",
+                kpi_target={"roas": 6.0, "orders": 420},
+            ),
+        ]
+        for budget in budgets:
+            session.add(budget)
+
+        invoices = [
+            Invoice(
+                client_id=digital_growth.id,
+                reference="DG-2024-001",
+                amount_due=8200.0,
+                status="sent",
+                line_items=[
+                    {"description": "Google Ads Media Spend", "amount": 5000.0},
+                    {"description": "KI-Automation & Reporting", "amount": 1800.0},
+                    {"description": "CMS Optimierung", "amount": 1400.0},
+                ],
+                metadata={"period": "2024-02"},
+            ),
+            Invoice(
+                client_id=digital_growth.id,
+                reference="DG-2024-002",
+                amount_due=6400.0,
+                status="paid",
+                line_items=[
+                    {"description": "LinkedIn Kampagnen", "amount": 3600.0},
+                    {"description": "Realtime Dashboard Lizenz", "amount": 2800.0},
+                ],
+                metadata={"period": "2024-01"},
+            ),
+            Invoice(
+                client_id=ecom_sprint.id,
+                reference="EC-2024-001",
+                amount_due=5400.0,
+                status="sent",
+                line_items=[
+                    {"description": "Performance Max Betreuung", "amount": 4200.0},
+                    {"description": "SEO Content Automation", "amount": 1200.0},
+                ],
+                metadata={"period": "2024-02"},
+            ),
+        ]
+        for invoice in invoices:
+            session.add(invoice)
+
+        proposals = [
+            Proposal(
+                client_id=digital_growth.id,
+                title="Realtime Growth Paket Q2",
+                summary="Always-on OSINT, Ads Budgetsteuerung und SEO Sprints.",
+                currency="EUR",
+                line_items=[
+                    {
+                        "name": "Strategic Growth Sprint",
+                        "minutes": 960.0,
+                        "rate_per_minute": 2.8,
+                        "category": "service",
+                        "cost": 2688.0,
+                    },
+                    {
+                        "name": "Cloud Automation & Monitoring",
+                        "minutes": 240.0,
+                        "rate_per_minute": 2.8,
+                        "category": "subscription",
+                        "cost": 672.0,
+                    },
+                ],
+                estimated_minutes=1200.0,
+                margin_percent=0.25,
+                total_value=4190.0,
+                status="sent",
+                metadata={"generated": False, "region": "DACH"},
+            ),
+            Proposal(
+                client_id=ecom_sprint.id,
+                title="E-Com Skalierung",
+                summary="Automatisierte Ads & SEO Optimierung für D2C Retail.",
+                currency="EUR",
+                line_items=[
+                    {
+                        "name": "Performance Ads Automation",
+                        "minutes": 720.0,
+                        "rate_per_minute": 2.1,
+                        "category": "service",
+                        "cost": 1512.0,
+                    },
+                    {
+                        "name": "Realtime KPI Dashboard",
+                        "minutes": 180.0,
+                        "rate_per_minute": 2.1,
+                        "category": "subscription",
+                        "cost": 378.0,
+                    },
+                ],
+                estimated_minutes=900.0,
+                margin_percent=0.2,
+                total_value=2268.0,
+                status="draft",
+                metadata={"generated": False, "region": "EU"},
+            ),
+        ]
+        for proposal in proposals:
+            session.add(proposal)
 
         session.commit()
 

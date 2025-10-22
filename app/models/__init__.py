@@ -1,5 +1,25 @@
 """Database models and API schemas."""
 
+from .accounts import (
+    BudgetAllocation,
+    BudgetCreate,
+    BudgetRead,
+    Client,
+    ClientCreate,
+    ClientRead,
+    ClientSummary,
+    Invoice,
+    InvoiceCreate,
+    InvoiceRead,
+    PricingComponent,
+    Proposal,
+    ProposalCreate,
+    ProposalGenerationRequest,
+    ProposalRead,
+    Site,
+    SiteCreate,
+    SiteRead,
+)
 from .analytics import (
     SearchMetric,
     SearchMetricCreate,
@@ -19,6 +39,24 @@ from .osint import OSINTEvent, OSINTEventCreate, OSINTEventRead, OSINTSummary
 from .seo import MetadataPatch, SEOReport, SEOReportCreate, SEOReportRead
 
 __all__ = [
+    "Client",
+    "ClientCreate",
+    "ClientRead",
+    "ClientSummary",
+    "Site",
+    "SiteCreate",
+    "SiteRead",
+    "BudgetAllocation",
+    "BudgetCreate",
+    "BudgetRead",
+    "Invoice",
+    "InvoiceCreate",
+    "InvoiceRead",
+    "Proposal",
+    "ProposalCreate",
+    "ProposalRead",
+    "PricingComponent",
+    "ProposalGenerationRequest",
     "AutomationRule",
     "AutomationRuleCreate",
     "AutomationRuleRead",

@@ -2,6 +2,8 @@
 
 from . import nlp
 from .automation import AutomationEngine
+from .billing import BillingEngine
+from .client_portfolio import ClientPortfolioManager
 from .content_hub import ContentHub, generate_ai_caption
 from .dashboard import (
     dashboard_overview,
@@ -32,5 +34,7 @@ __all__ = [
     "traffic_breakdown",
     "search_console_snapshot",
     "realtime_engagement",
+    "BillingEngine",
+    "ClientPortfolioManager",
     "nlp",
 ]

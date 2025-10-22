@@ -17,17 +17,21 @@ Metadaten für gängige CMS-Plattformen und bietet automatisierte Playbooks für
 - **Automatisierung**: Regel-Engine, die auf OSINT- oder SEO-Ereignisse reagiert.
 - **Analytics Hub**: Vollwertiger Ersatz für Google Analytics & Search Console mit KPIs,
   Traffic-Breakdown und Echtzeit-Engagement.
+- **Mandanten & Abrechnung**: Multi-Site- und Kundenverwaltung inkl. Google-Ads-Budgets,
+  Rechnungslegung, KPI-Auswertung und KI-basierter Angebotskalkulation pro Minute.
 - **Visualisierung**: Aggregationen zu Mention-Volumen und Sentiment-Verläufen je Plattform.
 
 ## Architektur
 
 ```
 FastAPI (REST & WebSocket)
-├── Routers: /osint, /seo, /content, /automation, /analytics
+├── Routers: /osint, /seo, /content, /automation, /analytics, /clients, /billing
 ├── Services: OSINTStream, SEOOptimizer, MarketingOptimizer, ContentHub,
-│            SocialNetworkRouter, Dashboard Analytics, AutomationEngine
+│            SocialNetworkRouter, Dashboard Analytics, AutomationEngine,
+│            ClientPortfolioManager, BillingEngine
 ├── CMS-Connectoren: WordPress, Ghost, Odoo (API-basiert)
-└── SQLModel + SQLite: Persistenzschicht für Events, Content, Analytics, SEO-Reports und Regeln
+└── SQLModel + SQLite: Persistenzschicht für Events, Content, Analytics, SEO-Reports,
+   Mandanten, Budgets, Rechnungen und Angebote
 ```
 
 ## Schnellstart
@@ -54,8 +58,20 @@ Nach dem Start stehen folgende Komponenten zur Verfügung:
 - `GET /analytics/search-console` – Keywords, Klicks, CTR & Positionen
 - `GET /analytics/traffic` – Traffic-Breakdown je Quelle
 - `GET /analytics/engagement` – 24h-Engagement-Radar
+- `GET /clients/` – Mandantenübersicht inkl. Kontaktinformationen
+- `POST /clients/{id}/sites` – weitere Sites & Workspaces für einen Kunden anlegen
+- `GET /clients/{id}/summary` – KPI-Zusammenfassung aus Budgets, Rechnungen & Proposals
+- `GET /billing/budgets` – Kanal- und Kampagnenbudgets mit Spend-Tracking
+- `POST /billing/proposals/generate` – Automatische Angebotserstellung nach Minutenpreisen
 
 Demo-Daten werden beim Start automatisch erzeugt (`Settings.enable_demo_data`).
+
+### Demo-Daten
+
+Die Seed-Daten erzeugen zwei Beispielkunden (`Digital Growth GmbH` & `Ecom Sprint AG`) mit
+mehreren Sites, Google-Ads- und SEO-Budgets, offenen & bezahlten Rechnungen sowie
+Angebotsentwürfen. Dadurch lässt sich das Multi-Tenant-Controlling sofort im Dashboard,
+über die `/clients`- und `/billing`-APIs sowie in den Analytics-KPIs nachvollziehen.
 
 ## Konfiguration
 
