@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Social Media OSINT Cockpit</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bg: linear-gradient(145deg, #0b1120 0%, #111c3d 45%, #050b1a 100%);
+        --panel: rgba(15, 23, 42, 0.85);
+        --card: rgba(30, 41, 59, 0.9);
+        --border: rgba(148, 163, 184, 0.25);
+        --accent: #38bdf8;
+        --accent-strong: #0ea5e9;
+        --success: #22c55e;
+        --warning: #f97316;
+        --danger: #f43f5e;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --shadow: 0 20px 55px rgba(15, 23, 42, 0.45);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        background-attachment: fixed;
+        color: var(--text);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .app-shell {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem 4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      header.masthead {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(15, 118, 110, 0.12));
+        border-radius: 28px;
+        padding: 2.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.5rem;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        box-shadow: var(--shadow);
+      }
+
+      header.masthead h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.9rem, 3vw, 2.9rem);
+        letter-spacing: -0.02em;
+      }
+
+      header.masthead p {
+        margin: 0;
+        max-width: 640px;
+        color: rgba(226, 232, 240, 0.75);
+        line-height: 1.6;
+      }
+
+      .masthead-status {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        align-items: flex-end;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.6);
+      }
+
+      .badge.live {
+        color: var(--success);
+        border-color: rgba(34, 197, 94, 0.45);
+        background: rgba(22, 163, 74, 0.1);
+      }
+
+      .badge.offline {
+        color: var(--muted);
+        background: rgba(148, 163, 184, 0.12);
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+
+      .tabs button {
+        border: 1px solid transparent;
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--muted);
+        padding: 0.65rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 120ms ease, color 120ms ease;
+      }
+
+      .tabs button:hover {
+        border-color: rgba(56, 189, 248, 0.35);
+        color: var(--text);
+        transform: translateY(-1px);
+      }
+
+      .tabs button.active {
+        color: var(--text);
+        border-color: rgba(56, 189, 248, 0.55);
+        background: rgba(15, 118, 110, 0.2);
+      }
+
+      main.panels {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      section.panel {
+        display: none;
+        background: var(--panel);
+        border-radius: 24px;
+        padding: 1.75rem;
+        border: 1px solid rgba(56, 189, 248, 0.08);
+        box-shadow: 0 16px 40px rgba(2, 6, 23, 0.4);
+      }
+
+      section.panel.active {
+        display: block;
+      }
+
+      section.panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      section.panel header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      section.panel header button {
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(30, 41, 59, 0.7);
+        color: var(--text);
+        padding: 0.55rem 1rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      section.panel header button:hover {
+        border-color: rgba(56, 189, 248, 0.4);
+        background: rgba(30, 64, 175, 0.35);
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.4rem;
+      }
+
+      .kpi-card {
+        background: var(--card);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .kpi-card span.label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(226, 232, 240, 0.6);
+      }
+
+      .kpi-card span.value {
+        font-size: 1.35rem;
+        font-weight: 600;
+      }
+
+      .split-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+
+      ul.metric-list,
+      ul.simple-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+
+      ul.metric-list li,
+      ul.simple-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        padding: 0.65rem 0.85rem;
+        font-size: 0.95rem;
+      }
+
+      ul.metric-list li span.label {
+        color: var(--muted);
+      }
+
+      ul.metric-list li span.value {
+        font-weight: 600;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        font-size: 0.95rem;
+      }
+
+      table thead {
+        color: rgba(226, 232, 240, 0.65);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      table th,
+      table td {
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        vertical-align: top;
+      }
+
+      table tbody tr:hover {
+        background: rgba(30, 64, 175, 0.15);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .stack label {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.85rem;
+        gap: 0.35rem;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      textarea {
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 12px;
+        padding: 0.55rem 0.75rem;
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      button.primary {
+        background: var(--accent-strong);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: #f8fafc;
+        padding: 0.65rem 1.2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      button.secondary {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        color: var(--text);
+        padding: 0.65rem 1.1rem;
+        border-radius: 12px;
+        cursor: pointer;
+      }
+
+      button.primary:hover,
+      button.secondary:hover {
+        transform: translateY(-1px);
+      }
+
+      .grid-two {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 18px;
+        padding: 1rem;
+      }
+
+      .card h3 {
+        margin: 0 0 0.75rem;
+        font-size: 1.05rem;
+      }
+
+      .empty {
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .tag {
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 999px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+      }
+
+      .toast-container {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        z-index: 99;
+      }
+
+      .toast {
+        background: rgba(15, 23, 42, 0.92);
+        border-radius: 14px;
+        padding: 0.75rem 1.1rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        min-width: 220px;
+        box-shadow: 0 12px 30px rgba(2, 6, 23, 0.55);
+      }
+
+      .toast.success {
+        border-color: rgba(34, 197, 94, 0.45);
+      }
+
+      .toast.error {
+        border-color: rgba(244, 63, 94, 0.45);
+      }
+
+      .pill-set {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .pill-set label {
+        background: rgba(15, 23, 42, 0.45);
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .pill-set input[type="checkbox"] {
+        accent-color: var(--accent-strong);
+      }
+
+      .client-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+      }
+
+      .client-card {
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 18px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        cursor: pointer;
+      }
+
+      .client-card:hover {
+        border-color: rgba(56, 189, 248, 0.45);
+      }
+
+      .client-card strong {
+        font-size: 1.05rem;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+
+      .summary-card {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 16px;
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .summary-card span.label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .summary-card span.value {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .seo-report {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+      }
+
+      .seo-report .card ul {
+        margin: 0;
+        padding-left: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .seo-report .card ul li {
+        color: rgba(226, 232, 240, 0.85);
+      }
+
+      @media (max-width: 720px) {
+        header.masthead {
+          padding: 2rem;
+        }
+
+        section.panel {
+          padding: 1.35rem;
+        }
+
+        table {
+          font-size: 0.88rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="masthead">
+        <div>
+          <h1>Realtime OSINT & Marketing Cockpit</h1>
+          <p>
+            Vollintegrierte Plattform für Social Media Monitoring, SEO-Optimierung,
+            Content-Orchestrierung und Mandanten-Abrechnung – alles in einer Web-Oberfläche.
+          </p>
+        </div>
+        <div class="masthead-status">
+          <span id="stream-status" class="badge offline">Stream offline</span>
+          <span class="badge">Letzte Aktualisierung: <span id="last-refresh">–</span></span>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button type="button" class="active" data-target="analytics">Analytics</button>
+        <button type="button" data-target="osint">OSINT</button>
+        <button type="button" data-target="content">Content Hub</button>
+        <button type="button" data-target="clients">Mandanten</button>
+        <button type="button" data-target="billing">Abrechnung</button>
+        <button type="button" data-target="seo">SEO</button>
+      </nav>
+
+      <main class="panels">
+        <section class="panel active" data-panel="analytics">
+          <header>
+            <h2>Analytics & KPIs</h2>
+            <button type="button" id="refresh-analytics">Aktualisieren</button>
+          </header>
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="label">Sessions</span>
+              <span class="value" id="kpi-sessions">–</span>
+            </div>
+            <div class="kpi-card">
+              <span class="label">Pageviews</span>
+              <span class="value" id="kpi-pageviews">–</span>
+            </div>
+            <div class="kpi-card">
+              <span class="label">Conversions</span>
+              <span class="value" id="kpi-conversions">–</span>
+            </div>
+            <div class="kpi-card">
+              <span class="label">Ø Sessiondauer</span>
+              <span class="value" id="kpi-duration">–</span>
+            </div>
+            <div class="kpi-card">
+              <span class="label">Bounce Rate</span>
+              <span class="value" id="kpi-bounce">–</span>
+            </div>
+            <div class="kpi-card">
+              <span class="label">Engagement Score</span>
+              <span class="value" id="kpi-engagement">–</span>
+            </div>
+          </div>
+          <div class="split-grid">
+            <div class="card">
+              <h3>Traffic-Quellen</h3>
+              <ul class="metric-list" id="traffic-list">
+                <li class="empty">Keine Daten geladen.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Search Console Top Queries</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th>Klicks</th>
+                    <th>Impr.</th>
+                    <th>CTR</th>
+                    <th>Position</th>
+                  </tr>
+                </thead>
+                <tbody id="search-table">
+                  <tr>
+                    <td colspan="5" class="empty">Noch keine Search Console Daten.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="split-grid" style="margin-top: 1.25rem;">
+            <div class="card">
+              <h3>Marketing Gesundheit</h3>
+              <ul class="metric-list" id="marketing-list">
+                <li class="empty">Keine Kampagnen vorhanden.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>OSINT Überblick</h3>
+              <ul class="metric-list" id="osint-overview">
+                <li class="empty">Keine OSINT Events.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="osint">
+          <header>
+            <h2>Live OSINT Stream</h2>
+            <button type="button" id="refresh-osint">Neu laden</button>
+          </header>
+          <div class="card" style="margin-bottom: 1rem;">
+            <strong>Letzte Events</strong>
+            <p class="empty" id="osint-empty">Es wurden noch keine Events geladen.</p>
+          </div>
+          <div class="card">
+            <div style="overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Plattform</th>
+                    <th>Autor</th>
+                    <th>Sentiment</th>
+                    <th>Engagement</th>
+                    <th>Tags</th>
+                    <th>Zeitstempel</th>
+                  </tr>
+                </thead>
+                <tbody id="osint-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="content">
+          <header>
+            <h2>Content Hub & Distribution</h2>
+            <div class="form-actions">
+              <button type="button" class="secondary" id="refresh-content">Aktualisieren</button>
+            </div>
+          </header>
+          <div class="grid-two">
+            <form id="content-generate-form" class="card stack">
+              <h3>KI-Content generieren</h3>
+              <label>
+                Thema
+                <input type="text" name="topic" placeholder="Produktlaunch, Q4 Ziele ..." required />
+              </label>
+              <label>
+                Tonalität
+                <select name="tone">
+                  <option value="professionell">Professionell</option>
+                  <option value="inspirierend">Inspirierend</option>
+                  <option value="informell">Informell</option>
+                  <option value="sales">Sales</option>
+                </select>
+              </label>
+              <label>
+                Kanal
+                <select name="channel">
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="twitter">Twitter</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="wordpress">WordPress</option>
+                </select>
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="primary">KI-Post erstellen</button>
+              </div>
+            </form>
+            <div class="card stack">
+              <h3>Verfügbare Netzwerke</h3>
+              <div id="destination-list" class="pill-set">
+                <span class="empty">Noch keine Daten.</span>
+              </div>
+              <form id="content-status-form" class="stack">
+                <h4>Status aktualisieren</h4>
+                <label>
+                  Content Item
+                  <select id="content-status-item" required></select>
+                </label>
+                <label>
+                  Status
+                  <select id="content-status-value">
+                    <option value="draft">Draft</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </label>
+                <button type="submit" class="secondary">Speichern</button>
+              </form>
+              <form id="content-publish-form" class="stack">
+                <h4>Multi-Channel Publishing</h4>
+                <label>
+                  Content Item
+                  <select id="publish-item" required></select>
+                </label>
+                <div id="publish-networks" class="pill-set"></div>
+                <button type="submit" class="primary">Jetzt verteilen</button>
+              </form>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 1.25rem;">
+            <div style="overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Titel</th>
+                    <th>Kanal</th>
+                    <th>Status</th>
+                    <th>Tags</th>
+                    <th>Aktualisiert</th>
+                  </tr>
+                </thead>
+                <tbody id="content-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="clients">
+          <header>
+            <h2>Mandantenverwaltung</h2>
+            <button type="button" id="refresh-clients">Neu laden</button>
+          </header>
+          <div class="client-grid" id="client-list"></div>
+          <div class="card" id="client-summary" style="margin-top: 1.25rem;">
+            <strong>Mandanten-Kennzahlen</strong>
+            <p class="empty">Wähle einen Mandanten aus, um Details zu sehen.</p>
+          </div>
+          <div class="grid-two" style="margin-top: 1.25rem;">
+            <form id="client-form" class="card stack">
+              <h3>Neuen Mandanten anlegen</h3>
+              <label>
+                Name
+                <input type="text" name="name" required />
+              </label>
+              <label>
+                Branche
+                <input type="text" name="industry" placeholder="E-Commerce, SaaS ..." required />
+              </label>
+              <label>
+                Ansprechpartner E-Mail
+                <input type="email" name="contact_email" required />
+              </label>
+              <label>
+                Ansprechpartner Telefon
+                <input type="tel" name="contact_phone" />
+              </label>
+              <label>
+                Zeitzone
+                <input type="text" name="timezone" value="Europe/Berlin" />
+              </label>
+              <label>
+                Minutenpreis (EUR)
+                <input type="number" name="billing_rate_per_minute" step="0.01" value="2.4" />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="primary">Mandanten speichern</button>
+              </div>
+            </form>
+            <form id="site-form" class="card stack">
+              <h3>Neue Site hinzufügen</h3>
+              <label>
+                Mandant
+                <select name="client_id" id="site-client" required></select>
+              </label>
+              <label>
+                Name
+                <input type="text" name="name" required />
+              </label>
+              <label>
+                URL
+                <input type="url" name="url" required />
+              </label>
+              <label>
+                Plattform
+                <input type="text" name="platform" placeholder="WordPress, Ghost, Custom ..." required />
+              </label>
+              <label>
+                Workspace
+                <input type="text" name="workspace" placeholder="(optional)" />
+              </label>
+              <label>
+                Integrationen (Komma separiert)
+                <input type="text" name="integrations" placeholder="analytics, ads, search" />
+              </label>
+              <label style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="api_connected" /> API verbunden
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="secondary">Site anlegen</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="billing">
+          <header>
+            <h2>Budget & Abrechnung</h2>
+            <button type="button" id="refresh-billing">Aktualisieren</button>
+          </header>
+          <div class="grid-two">
+            <div class="card">
+              <h3>Budgets</h3>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Mandant</th>
+                      <th>Kampagne</th>
+                      <th>Kanal</th>
+                      <th>Budget</th>
+                      <th>Spend</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="budget-table"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Rechnungen</h3>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Mandant</th>
+                      <th>Referenz</th>
+                      <th>Betrag</th>
+                      <th>Status</th>
+                      <th>Fällig</th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoice-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 1.25rem;">
+            <h3>Angebote</h3>
+            <div style="overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Mandant</th>
+                    <th>Titel</th>
+                    <th>Status</th>
+                    <th>Wert</th>
+                    <th>Valid bis</th>
+                  </tr>
+                </thead>
+                <tbody id="proposal-table"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="grid-two" style="margin-top: 1.25rem;">
+            <form id="budget-form" class="card stack">
+              <h3>Budget planen</h3>
+              <label>
+                Mandant
+                <select name="client_id" id="budget-client" required></select>
+              </label>
+              <label>
+                Site ID (optional)
+                <input type="number" name="site_id" min="0" />
+              </label>
+              <label>
+                Kampagnenname
+                <input type="text" name="campaign_name" required />
+              </label>
+              <label>
+                Kanal
+                <input type="text" name="channel" value="google_ads" required />
+              </label>
+              <label>
+                Währung
+                <input type="text" name="currency" value="EUR" />
+              </label>
+              <label>
+                Budget (gesamt)
+                <input type="number" name="allocated_budget" step="0.01" required />
+              </label>
+              <label>
+                Start
+                <input type="datetime-local" name="period_start" required />
+              </label>
+              <label>
+                Ende
+                <input type="datetime-local" name="period_end" required />
+              </label>
+              <label>
+                Status
+                <input type="text" name="status" value="active" />
+              </label>
+              <label>
+                KPI Ziele (JSON optional)
+                <textarea name="kpi_target" placeholder='{"cpl": 45}'></textarea>
+              </label>
+              <button type="submit" class="primary">Budget speichern</button>
+            </form>
+            <div class="card stack">
+              <form id="spend-form" class="stack">
+                <h3>Spend verbuchen</h3>
+                <label>
+                  Budget ID
+                  <input type="number" name="budget_id" required />
+                </label>
+                <label>
+                  Änderung (EUR)
+                  <input type="number" name="delta" step="0.01" required />
+                </label>
+                <button type="submit" class="secondary">Aktualisieren</button>
+              </form>
+              <form id="invoice-form" class="stack">
+                <h3>Rechnung erzeugen</h3>
+                <label>
+                  Mandant
+                  <select name="client_id" id="invoice-client" required></select>
+                </label>
+                <label>
+                  Referenz
+                  <input type="text" name="reference" required />
+                </label>
+                <label>
+                  Betrag
+                  <input type="number" name="amount_due" step="0.01" required />
+                </label>
+                <label>
+                  Währung
+                  <input type="text" name="currency" value="EUR" />
+                </label>
+                <label>
+                  Status
+                  <input type="text" name="status" value="draft" />
+                </label>
+                <label>
+                  Ausgestellt am
+                  <input type="datetime-local" name="issued_at" required />
+                </label>
+                <label>
+                  Fällig am
+                  <input type="datetime-local" name="due_at" required />
+                </label>
+                <label>
+                  Positionen (JSON)
+                  <textarea name="line_items" placeholder='[{"name": "Setup", "amount": 1200}]'></textarea>
+                </label>
+                <label>
+                  Metadaten (JSON optional)
+                  <textarea name="metadata" placeholder='{"po": "PO-123"}'></textarea>
+                </label>
+                <button type="submit" class="primary">Rechnung speichern</button>
+              </form>
+              <form id="invoice-status-form" class="stack">
+                <h3>Status ändern</h3>
+                <label>
+                  Rechnungs-ID
+                  <input type="number" name="invoice_id" required />
+                </label>
+                <label>
+                  Neuer Status
+                  <input type="text" name="status" value="paid" />
+                </label>
+                <button type="submit" class="secondary">Aktualisieren</button>
+              </form>
+              <form id="proposal-form" class="stack">
+                <h3>Angebot generieren</h3>
+                <label>
+                  Mandant
+                  <select name="client_id" id="proposal-client" required></select>
+                </label>
+                <label>
+                  Titel
+                  <input type="text" name="title" required />
+                </label>
+                <label>
+                  Zusammenfassung
+                  <textarea name="summary" placeholder="Optionale Kurzbeschreibung"></textarea>
+                </label>
+                <label>
+                  Komponenten (JSON Array)
+                  <textarea name="components" placeholder='[{"name": "SEO Audit", "minutes": 240}]'></textarea>
+                </label>
+                <label>
+                  Währung
+                  <input type="text" name="currency" value="EUR" />
+                </label>
+                <label>
+                  Marge (%)
+                  <input type="number" name="margin_percent" value="20" />
+                </label>
+                <label>
+                  Gültigkeit (Tage)
+                  <input type="number" name="valid_days" value="30" />
+                </label>
+                <label style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                  <input type="checkbox" name="include_subscription" checked />
+                  Abo-Leistungen einbeziehen
+                </label>
+                <button type="submit" class="primary">Angebot erstellen</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="seo">
+          <header>
+            <h2>SEO Analyse & Metadaten</h2>
+            <button type="button" id="refresh-seo">Letzten Report anzeigen</button>
+          </header>
+          <div class="grid-two">
+            <form id="seo-analyse-form" class="card stack">
+              <h3>URL analysieren</h3>
+              <label>
+                URL
+                <input type="url" name="url" placeholder="https://example.com" required />
+              </label>
+              <button type="submit" class="primary">Analyse starten</button>
+            </form>
+            <form id="metadata-form" class="card stack">
+              <h3>Metadaten pushen</h3>
+              <label>
+                Titel
+                <input type="text" name="title" placeholder="Optimierter Title" />
+              </label>
+              <label>
+                Beschreibung
+                <textarea name="description" placeholder="Meta Description"></textarea>
+              </label>
+              <label>
+                Keywords (Komma separiert)
+                <input type="text" name="keywords" placeholder="keyword1, keyword2" />
+              </label>
+              <label>
+                OpenGraph Bild
+                <input type="url" name="og_image" placeholder="https://..." />
+              </label>
+              <button type="submit" class="secondary">Metadaten speichern</button>
+            </form>
+          </div>
+          <div class="seo-report" style="margin-top: 1.25rem;">
+            <div class="card">
+              <h3>Analyse</h3>
+              <div class="summary-card" style="margin-bottom: 0.75rem;">
+                <span class="label">Score</span>
+                <span class="value" id="seo-score">–</span>
+              </div>
+              <p><strong>URL:</strong> <span id="seo-url">–</span></p>
+              <p><strong>Titel:</strong> <span id="seo-title">–</span></p>
+              <p><strong>Description:</strong> <span id="seo-description">–</span></p>
+              <p><strong>Keywords:</strong> <span id="seo-keywords">–</span></p>
+            </div>
+            <div class="card">
+              <h3>Issues</h3>
+              <ul id="seo-issues">
+                <li class="empty">Noch keine Analyse durchgeführt.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Empfehlungen</h3>
+              <ul id="seo-recommendations">
+                <li class="empty">Noch keine Analyse durchgeführt.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+
+    <template id="osint-row-template">
+      <tr>
+        <td data-field="platform"></td>
+        <td data-field="author"></td>
+        <td data-field="sentiment"></td>
+        <td data-field="engagement"></td>
+        <td data-field="tags"></td>
+        <td data-field="timestamp"></td>
+      </tr>
+    </template>
+
+    <template id="content-row-template">
+      <tr>
+        <td data-field="id"></td>
+        <td data-field="title"></td>
+        <td data-field="channel"></td>
+        <td data-field="status"></td>
+        <td data-field="tags"></td>
+        <td data-field="updated"></td>
+      </tr>
+    </template>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const panels = document.querySelectorAll("section.panel");
+        const tabButtons = document.querySelectorAll(".tabs button[data-target]");
+        const state = {
+          analytics: null,
+          osint: [],
+          content: [],
+          destinations: {},
+          clients: [],
+          clientSummaries: new Map(),
+          budgets: [],
+          invoices: [],
+          proposals: [],
+          lastSeoReport: null,
+        };
+
+        const toastContainer = document.getElementById("toast-container");
+        const streamStatus = document.getElementById("stream-status");
+        const lastRefresh = document.getElementById("last-refresh");
+
+        function setActivePanel(name) {
+          panels.forEach((panel) => {
+            panel.classList.toggle("active", panel.dataset.panel === name);
+          });
+          tabButtons.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.target === name);
+          });
+        }
+
+        tabButtons.forEach((btn) => {
+          btn.addEventListener("click", () => setActivePanel(btn.dataset.target));
+        });
+
+        function showToast(message, variant = "info") {
+          const toast = document.createElement("div");
+          toast.className = `toast ${variant}`;
+          toast.textContent = message;
+          toastContainer.appendChild(toast);
+          setTimeout(() => {
+            toast.remove();
+          }, 5000);
+        }
+
+        function formatNumber(value, digits = 0) {
+          if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return "–";
+          }
+          return Number(value).toLocaleString("de-DE", {
+            minimumFractionDigits: digits,
+            maximumFractionDigits: digits,
+          });
+        }
+
+        function formatPercent(value, digits = 1) {
+          if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return "–";
+          }
+          return `${formatNumber(value, digits)}%`;
+        }
+
+        function formatCurrency(value) {
+          if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return "–";
+          }
+          return new Intl.NumberFormat("de-DE", {
+            style: "currency",
+            currency: "EUR",
+            maximumFractionDigits: 2,
+          }).format(Number(value));
+        }
+
+        function formatDate(value) {
+          if (!value) return "–";
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) {
+            return value;
+          }
+          return date.toLocaleString("de-DE", { hour12: false });
+        }
+
+        async function fetchJSON(url, options = {}) {
+          const config = { ...options };
+          config.headers = {
+            Accept: "application/json",
+            ...(options.headers || {}),
+          };
+          if (options.body && !(options.body instanceof FormData)) {
+            config.headers["Content-Type"] = "application/json";
+          }
+          const response = await fetch(url, config);
+          if (!response.ok) {
+            let detail = `${response.status} ${response.statusText}`;
+            try {
+              const data = await response.json();
+              detail = data.detail || JSON.stringify(data);
+            } catch (err) {
+              try {
+                detail = await response.text();
+              } catch (err2) {
+                console.warn("Antwort konnte nicht gelesen werden", err2);
+              }
+            }
+            throw new Error(detail);
+          }
+          if (response.status === 204) {
+            return null;
+          }
+          const type = response.headers.get("content-type") || "";
+          if (!type.includes("application/json")) {
+            return null;
+          }
+          return response.json();
+        }
+
+        function updateAnalyticsUI(overview) {
+          if (!overview) return;
+          state.analytics = overview;
+          const kpis = overview.kpis || {};
+          document.getElementById("kpi-sessions").textContent = formatNumber(kpis.sessions);
+          document.getElementById("kpi-pageviews").textContent = formatNumber(kpis.pageviews);
+          document.getElementById("kpi-conversions").textContent = formatNumber(kpis.conversions);
+          document.getElementById("kpi-duration").textContent = `${formatNumber(
+            kpis.avg_session_duration,
+            1,
+          )} s`;
+          document.getElementById("kpi-bounce").textContent = formatPercent(kpis.bounce_rate, 1);
+          document.getElementById("kpi-engagement").textContent = formatNumber(
+            overview.engagement?.engagement_score,
+            2,
+          );
+          lastRefresh.textContent = new Date().toLocaleTimeString("de-DE", { hour12: false });
+
+          const trafficList = document.getElementById("traffic-list");
+          trafficList.innerHTML = "";
+          const traffic = overview.traffic || {};
+          if (Object.keys(traffic).length === 0) {
+            trafficList.innerHTML = '<li class="empty">Keine Traffic-Daten verfügbar.</li>';
+          } else {
+            Object.entries(traffic).forEach(([source, value]) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<span class="label">${source}</span><span class="value">${formatNumber(
+                value,
+                0,
+              )}</span>`;
+              trafficList.appendChild(li);
+            });
+          }
+
+          const searchTable = document.getElementById("search-table");
+          searchTable.innerHTML = "";
+          const queries = overview.search_console || {};
+          if (Object.keys(queries).length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = '<td colspan="5" class="empty">Keine Search Console Daten.</td>';
+            searchTable.appendChild(row);
+          } else {
+            Object.entries(queries).forEach(([query, metrics]) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${query}</td>
+                <td>${formatNumber(metrics.clicks)}</td>
+                <td>${formatNumber(metrics.impressions)}</td>
+                <td>${formatPercent(metrics.ctr, 2)}</td>
+                <td>${formatNumber(metrics.position, 1)}</td>
+              `;
+              searchTable.appendChild(row);
+            });
+          }
+
+          const marketingList = document.getElementById("marketing-list");
+          marketingList.innerHTML = "";
+          const marketing = overview.marketing || {};
+          if (Object.keys(marketing).length === 0) {
+            marketingList.innerHTML = '<li class="empty">Keine Kampagnen vorhanden.</li>';
+          } else {
+            Object.entries(marketing).forEach(([channel, score]) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<span class="label">${channel}</span><span class="value">${formatPercent(
+                score * 100,
+                1,
+              )}</span>`;
+              marketingList.appendChild(li);
+            });
+          }
+
+          const osintList = document.getElementById("osint-overview");
+          osintList.innerHTML = "";
+          const osint = overview.osint || {};
+          const volumes = osint.volume || {};
+          const sentiments = osint.sentiment || {};
+          if (Object.keys(volumes).length === 0) {
+            osintList.innerHTML = '<li class="empty">Keine OSINT Daten.</li>';
+          } else {
+            Object.entries(volumes).forEach(([platform, volume]) => {
+              const sentiment = sentiments[platform];
+              const li = document.createElement("li");
+              li.innerHTML = `<span class="label">${platform}</span><span class="value">${formatNumber(
+                volume,
+              )} · Sentiment ${formatNumber(sentiment, 2)}</span>`;
+              osintList.appendChild(li);
+            });
+          }
+        }
+
+        async function loadAnalytics() {
+          try {
+            const overview = await fetchJSON("/analytics/overview", { method: "GET" });
+            updateAnalyticsUI(overview);
+          } catch (error) {
+            showToast(`Analytics Fehler: ${error.message}`, "error");
+          }
+        }
+
+        function renderOsint(events) {
+          const table = document.getElementById("osint-table");
+          table.innerHTML = "";
+          const emptyState = document.getElementById("osint-empty");
+          if (events.length === 0) {
+            emptyState.textContent = "Es wurden noch keine Events geladen.";
+            return;
+          }
+          emptyState.textContent = `${events.length} Events geladen.`;
+          const template = document.getElementById("osint-row-template");
+          events.forEach((event) => {
+            const clone = template.content.firstElementChild.cloneNode(true);
+            clone.querySelector('[data-field="platform"]').textContent = event.platform;
+            clone.querySelector('[data-field="author"]').textContent = event.author || "–";
+            clone.querySelector('[data-field="sentiment"]').textContent = formatNumber(
+              event.sentiment,
+              2,
+            );
+            clone.querySelector('[data-field="engagement"]').textContent = formatNumber(
+              event.engagement_score,
+              2,
+            );
+            const tagCell = clone.querySelector('[data-field="tags"]');
+            tagCell.innerHTML = "";
+            (event.tags || []).forEach((tag) => {
+              const span = document.createElement("span");
+              span.className = "tag";
+              span.textContent = tag;
+              tagCell.appendChild(span);
+            });
+            clone.querySelector('[data-field="timestamp"]').textContent = formatDate(
+              event.event_at || event.captured_at,
+            );
+            table.appendChild(clone);
+          });
+        }
+
+        async function loadOsint() {
+          try {
+            const events = await fetchJSON("/osint/events", { method: "GET" });
+            state.osint = events || [];
+            renderOsint(state.osint);
+          } catch (error) {
+            showToast(`OSINT Fehler: ${error.message}`, "error");
+          }
+        }
+
+        function appendOsintEvent(event) {
+          state.osint.unshift(event);
+          state.osint = state.osint.slice(0, 200);
+          renderOsint(state.osint);
+        }
+
+        function connectOsintStream() {
+          const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+          const wsUrl = `${protocol}://${window.location.host}/osint/stream`;
+          let reconnectTimer;
+          try {
+            const socket = new WebSocket(wsUrl);
+            socket.addEventListener("open", () => {
+              streamStatus.textContent = "Stream live";
+              streamStatus.classList.remove("offline");
+              streamStatus.classList.add("live");
+            });
+            socket.addEventListener("message", (event) => {
+              try {
+                const payload = JSON.parse(event.data);
+                appendOsintEvent(payload);
+              } catch (err) {
+                console.warn("WebSocket payload konnte nicht verarbeitet werden", err);
+              }
+            });
+            socket.addEventListener("close", () => {
+              streamStatus.textContent = "Stream offline";
+              streamStatus.classList.remove("live");
+              streamStatus.classList.add("offline");
+              reconnectTimer = window.setTimeout(connectOsintStream, 3000);
+            });
+            socket.addEventListener("error", () => {
+              socket.close();
+            });
+          } catch (error) {
+            console.warn("WebSocket konnte nicht initialisiert werden", error);
+            reconnectTimer = window.setTimeout(connectOsintStream, 5000);
+          }
+          return () => reconnectTimer && window.clearTimeout(reconnectTimer);
+        }
+
+        function renderDestinations(destinations) {
+          const container = document.getElementById("destination-list");
+          container.innerHTML = "";
+          const networkWrapper = document.getElementById("publish-networks");
+          networkWrapper.innerHTML = "";
+          if (!destinations || Object.keys(destinations).length === 0) {
+            container.innerHTML = '<span class="empty">Keine Netzwerke registriert.</span>';
+            networkWrapper.innerHTML = '<span class="empty">Keine Netzwerke verfügbar.</span>';
+            return;
+          }
+          Object.entries(destinations).forEach(([name, features]) => {
+            const pill = document.createElement("span");
+            pill.className = "tag";
+            pill.textContent = `${name} (${features.join(", ")})`;
+            container.appendChild(pill);
+
+            const label = document.createElement("label");
+            label.innerHTML = `<input type="checkbox" value="${name}" name="network" /> ${name}`;
+            networkWrapper.appendChild(label);
+          });
+        }
+
+        function renderContent(items) {
+          const table = document.getElementById("content-table");
+          table.innerHTML = "";
+          const template = document.getElementById("content-row-template");
+          if (!items || items.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = '<td colspan="6" class="empty">Keine Inhalte vorhanden.</td>';
+            table.appendChild(row);
+            return;
+          }
+          items.forEach((item) => {
+            const clone = template.content.firstElementChild.cloneNode(true);
+            clone.querySelector('[data-field="id"]').textContent = item.id;
+            clone.querySelector('[data-field="title"]').textContent = item.title;
+            clone.querySelector('[data-field="channel"]').textContent = item.channel;
+            clone.querySelector('[data-field="status"]').textContent = item.status;
+            const tagCell = clone.querySelector('[data-field="tags"]');
+            tagCell.innerHTML = "";
+            (item.tags || []).forEach((tag) => {
+              const span = document.createElement("span");
+              span.className = "tag";
+              span.textContent = tag;
+              tagCell.appendChild(span);
+            });
+            clone.querySelector('[data-field="updated"]').textContent = formatDate(item.updated_at);
+            table.appendChild(clone);
+          });
+
+          const statusSelect = document.getElementById("content-status-item");
+          const publishSelect = document.getElementById("publish-item");
+          const options = items.map(
+            (item) => `<option value="${item.id}">#${item.id} · ${item.title.slice(0, 40)}</option>`,
+          );
+          statusSelect.innerHTML = options.join("");
+          publishSelect.innerHTML = options.join("");
+        }
+
+        async function loadContent() {
+          try {
+            const [items, destinations] = await Promise.all([
+              fetchJSON("/content/", { method: "GET" }),
+              fetchJSON("/content/destinations", { method: "GET" }),
+            ]);
+            state.content = items || [];
+            state.destinations = destinations || {};
+            renderContent(state.content);
+            renderDestinations(state.destinations);
+          } catch (error) {
+            showToast(`Content Fehler: ${error.message}`, "error");
+          }
+        }
+
+        async function loadClients() {
+          try {
+            const clients = await fetchJSON("/clients/", { method: "GET" });
+            state.clients = clients || [];
+            renderClients(state.clients);
+            updateClientSelections();
+          } catch (error) {
+            showToast(`Client Fehler: ${error.message}`, "error");
+          }
+        }
+
+        function renderClients(clients) {
+          const container = document.getElementById("client-list");
+          container.innerHTML = "";
+          if (!clients || clients.length === 0) {
+            container.innerHTML = '<p class="empty">Noch keine Mandanten erfasst.</p>';
+            return;
+          }
+          clients.forEach((client) => {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className = "client-card";
+            card.innerHTML = `
+              <strong>${client.name}</strong>
+              <span>${client.industry}</span>
+              <span>${client.contact_email}</span>
+            `;
+            card.addEventListener("click", () => showClientSummary(client.id));
+            container.appendChild(card);
+          });
+        }
+
+        function updateClientSelections() {
+          const selects = [
+            document.getElementById("site-client"),
+            document.getElementById("budget-client"),
+            document.getElementById("invoice-client"),
+            document.getElementById("proposal-client"),
+          ];
+          const options = state.clients
+            .map((client) => `<option value="${client.id}">${client.name}</option>`)
+            .join("");
+          selects.forEach((select) => {
+            if (!select) return;
+            select.innerHTML = options;
+          });
+        }
+
+        async function showClientSummary(clientId) {
+          const container = document.getElementById("client-summary");
+          try {
+            if (!state.clientSummaries.has(clientId)) {
+              const summary = await fetchJSON(`/clients/${clientId}/summary`, { method: "GET" });
+              state.clientSummaries.set(clientId, summary);
+            }
+            const summary = state.clientSummaries.get(clientId);
+            renderClientSummary(summary);
+          } catch (error) {
+            showToast(`Summary Fehler: ${error.message}`, "error");
+            container.innerHTML = `<strong>Mandanten-Kennzahlen</strong><p class="empty">${error.message}</p>`;
+          }
+        }
+
+        function renderClientSummary(summary) {
+          const container = document.getElementById("client-summary");
+          container.innerHTML = "";
+          if (!summary) {
+            container.innerHTML = '<strong>Mandanten-Kennzahlen</strong><p class="empty">Keine Daten.</p>';
+            return;
+          }
+          const header = document.createElement("div");
+          header.innerHTML = `
+            <strong>${summary.client.name}</strong>
+            <p>${summary.client.industry} · ${summary.total_sites} Sites</p>
+          `;
+          container.appendChild(header);
+          const grid = document.createElement("div");
+          grid.className = "summary-grid";
+          const metrics = [
+            { label: "Budgets aktiv", value: summary.active_budgets },
+            { label: "Budget (gesamt)", value: formatCurrency(summary.allocated_budget) },
+            { label: "Spend", value: formatCurrency(summary.spent_budget) },
+            { label: "Offene Rechnungen", value: formatCurrency(summary.outstanding_invoices) },
+            { label: "Angebote offen", value: summary.proposals_in_progress },
+            { label: "MRR", value: formatCurrency(summary.monthly_recurring_revenue) },
+          ];
+          metrics.forEach((metric) => {
+            const card = document.createElement("div");
+            card.className = "summary-card";
+            card.innerHTML = `<span class="label">${metric.label}</span><span class="value">${metric.value}</span>`;
+            grid.appendChild(card);
+          });
+          container.appendChild(grid);
+        }
+
+        function renderBudgets(budgets) {
+          const table = document.getElementById("budget-table");
+          table.innerHTML = "";
+          if (!budgets || budgets.length === 0) {
+            table.innerHTML = '<tr><td colspan="7" class="empty">Keine Budgets vorhanden.</td></tr>';
+            return;
+          }
+          budgets.forEach((budget) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${budget.id}</td>
+              <td>${budget.client_id}</td>
+              <td>${budget.campaign_name}</td>
+              <td>${budget.channel}</td>
+              <td>${formatCurrency(budget.allocated_budget)}</td>
+              <td>${formatCurrency(budget.spent_budget)}</td>
+              <td>${budget.status}</td>
+            `;
+            table.appendChild(row);
+          });
+        }
+
+        function renderInvoices(invoices) {
+          const table = document.getElementById("invoice-table");
+          table.innerHTML = "";
+          if (!invoices || invoices.length === 0) {
+            table.innerHTML = '<tr><td colspan="6" class="empty">Keine Rechnungen vorhanden.</td></tr>';
+            return;
+          }
+          invoices.forEach((invoice) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${invoice.id}</td>
+              <td>${invoice.client_id}</td>
+              <td>${invoice.reference}</td>
+              <td>${formatCurrency(invoice.amount_due)}</td>
+              <td>${invoice.status}</td>
+              <td>${formatDate(invoice.due_at)}</td>
+            `;
+            table.appendChild(row);
+          });
+        }
+
+        function renderProposals(proposals) {
+          const table = document.getElementById("proposal-table");
+          table.innerHTML = "";
+          if (!proposals || proposals.length === 0) {
+            table.innerHTML = '<tr><td colspan="6" class="empty">Keine Angebote vorhanden.</td></tr>';
+            return;
+          }
+          proposals.forEach((proposal) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${proposal.id}</td>
+              <td>${proposal.client_id}</td>
+              <td>${proposal.title}</td>
+              <td>${proposal.status}</td>
+              <td>${formatCurrency(proposal.total_value)}</td>
+              <td>${formatDate(proposal.valid_until)}</td>
+            `;
+            table.appendChild(row);
+          });
+        }
+
+        async function loadBilling() {
+          try {
+            const [budgets, invoices, proposals] = await Promise.all([
+              fetchJSON("/billing/budgets", { method: "GET" }),
+              fetchJSON("/billing/invoices", { method: "GET" }),
+              fetchJSON("/billing/proposals", { method: "GET" }),
+            ]);
+            state.budgets = budgets || [];
+            state.invoices = invoices || [];
+            state.proposals = proposals || [];
+            renderBudgets(state.budgets);
+            renderInvoices(state.invoices);
+            renderProposals(state.proposals);
+          } catch (error) {
+            showToast(`Billing Fehler: ${error.message}`, "error");
+          }
+        }
+
+        function renderSeoReport(report) {
+          if (!report) return;
+          state.lastSeoReport = report;
+          document.getElementById("seo-url").textContent = report.url || "–";
+          document.getElementById("seo-title").textContent = report.title || "–";
+          document.getElementById("seo-description").textContent = report.description || "–";
+          document.getElementById("seo-keywords").textContent = (report.keywords || []).join(", ") || "–";
+          document.getElementById("seo-score").textContent = formatNumber(report.score, 0);
+
+          const issues = document.getElementById("seo-issues");
+          issues.innerHTML = "";
+          if (!report.issues || report.issues.length === 0) {
+            issues.innerHTML = '<li class="empty">Keine Issues gefunden.</li>';
+          } else {
+            report.issues.forEach((issue) => {
+              const li = document.createElement("li");
+              li.textContent = issue;
+              issues.appendChild(li);
+            });
+          }
+
+          const recs = document.getElementById("seo-recommendations");
+          recs.innerHTML = "";
+          if (!report.recommendations || report.recommendations.length === 0) {
+            recs.innerHTML = '<li class="empty">Keine Empfehlungen verfügbar.</li>';
+          } else {
+            report.recommendations.forEach((rec) => {
+              const li = document.createElement("li");
+              li.textContent = rec;
+              recs.appendChild(li);
+            });
+          }
+        }
+
+        function parseJsonInput(value, fallback = null) {
+          const trimmed = (value || "").trim();
+          if (!trimmed) {
+            return fallback;
+          }
+          try {
+            return JSON.parse(trimmed);
+          } catch (error) {
+            throw new Error("Ungültiges JSON: " + error.message);
+          }
+        }
+
+        function collectKeywords(value) {
+          if (!value) return null;
+          return value
+            .split(",")
+            .map((keyword) => keyword.trim())
+            .filter(Boolean);
+        }
+        function loadLatestSeoReport() {
+          if (state.lastSeoReport) {
+            renderSeoReport(state.lastSeoReport);
+            showToast("Letzter SEO Report angezeigt.", "success");
+          } else {
+            showToast("Noch kein SEO Report vorhanden.");
+          }
+        }
+
+        document.getElementById("refresh-analytics").addEventListener("click", loadAnalytics);
+        document.getElementById("refresh-osint").addEventListener("click", loadOsint);
+        document.getElementById("refresh-content").addEventListener("click", loadContent);
+        document.getElementById("refresh-clients").addEventListener("click", loadClients);
+        document.getElementById("refresh-billing").addEventListener("click", loadBilling);
+        document.getElementById("refresh-seo").addEventListener("click", loadLatestSeoReport);
+
+        document.getElementById("content-generate-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const topic = form.topic.value.trim();
+          if (!topic) {
+            showToast("Bitte ein Thema angeben", "error");
+            return;
+          }
+          const params = new URLSearchParams({
+            topic,
+            tone: form.tone.value,
+            channel: form.channel.value,
+          });
+          try {
+            const item = await fetchJSON(`/content/generate?${params.toString()}`, { method: "POST" });
+            state.content.unshift(item);
+            renderContent(state.content);
+            showToast("Content erfolgreich generiert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Generierung fehlgeschlagen: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("content-status-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const itemId = document.getElementById("content-status-item").value;
+          const status = document.getElementById("content-status-value").value;
+          try {
+            const item = await fetchJSON(`/content/${itemId}/status?status=${encodeURIComponent(status)}`, {
+              method: "POST",
+            });
+            state.content = state.content.map((existing) => (existing.id === item.id ? item : existing));
+            renderContent(state.content);
+            showToast("Status aktualisiert", "success");
+          } catch (error) {
+            showToast(`Status Update fehlgeschlagen: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("content-publish-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const itemId = document.getElementById("publish-item").value;
+          const networks = Array.from(
+            document.querySelectorAll('#publish-networks input[name="network"]:checked'),
+          ).map((input) => input.value);
+          if (networks.length === 0) {
+            showToast("Bitte mindestens ein Netzwerk wählen", "error");
+            return;
+          }
+          try {
+            const response = await fetchJSON(`/content/${itemId}/publish`, {
+              method: "POST",
+              body: JSON.stringify({ networks }),
+            });
+            state.content = state.content.map((existing) =>
+              existing.id === response.item.id ? response.item : existing,
+            );
+            renderContent(state.content);
+            showToast(
+              `Dispatch gestartet: ${Object.keys(response.destinations).join(", ") || "keine Ziele"}`,
+              "success",
+            );
+          } catch (error) {
+            showToast(`Publishing fehlgeschlagen: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("client-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const payload = {
+            name: form.name.value.trim(),
+            industry: form.industry.value.trim(),
+            contact_email: form.contact_email.value.trim(),
+            contact_phone: form.contact_phone.value.trim() || null,
+            timezone: form.timezone.value.trim() || "Europe/Berlin",
+            billing_rate_per_minute: Number(form.billing_rate_per_minute.value || 0),
+            preferences: {},
+          };
+          try {
+            const client = await fetchJSON("/clients/", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.clients.push(client);
+            renderClients(state.clients);
+            updateClientSelections();
+            showToast("Mandant gespeichert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Mandant konnte nicht angelegt werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("site-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const clientId = form.client_id.value;
+          const integrations = form.integrations.value
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean);
+          const payload = {
+            client_id: Number(clientId),
+            name: form.name.value.trim(),
+            url: form.url.value.trim(),
+            platform: form.platform.value.trim(),
+            workspace: form.workspace.value.trim() || null,
+            connected_integrations: integrations,
+            api_connected: form.api_connected.checked,
+            metadata: {},
+          };
+          try {
+            await fetchJSON(`/clients/${clientId}/sites`, {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            showToast("Site angelegt", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Site konnte nicht erstellt werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("budget-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          try {
+            const payload = {
+              client_id: Number(form.client_id.value),
+              site_id: form.site_id.value ? Number(form.site_id.value) : null,
+              campaign_name: form.campaign_name.value.trim(),
+              channel: form.channel.value.trim(),
+              currency: form.currency.value.trim() || "EUR",
+              allocated_budget: Number(form.allocated_budget.value || 0),
+              period_start: new Date(form.period_start.value).toISOString(),
+              period_end: new Date(form.period_end.value).toISOString(),
+              status: form.status.value.trim() || "active",
+              kpi_target: parseJsonInput(form.kpi_target.value, null),
+            };
+            const budget = await fetchJSON("/billing/budgets", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.budgets.push(budget);
+            renderBudgets(state.budgets);
+            showToast("Budget gespeichert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Budget konnte nicht gespeichert werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("spend-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const budgetId = form.budget_id.value;
+          const payload = { delta: Number(form.delta.value || 0) };
+          try {
+            const budget = await fetchJSON(`/billing/budgets/${budgetId}/spend`, {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.budgets = state.budgets.map((existing) =>
+              existing.id === budget.id ? budget : existing,
+            );
+            renderBudgets(state.budgets);
+            showToast("Spend aktualisiert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Spend konnte nicht gebucht werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("invoice-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          try {
+            const payload = {
+              client_id: Number(form.client_id.value),
+              reference: form.reference.value.trim(),
+              amount_due: Number(form.amount_due.value || 0),
+              currency: form.currency.value.trim() || "EUR",
+              status: form.status.value.trim() || "draft",
+              issued_at: new Date(form.issued_at.value).toISOString(),
+              due_at: new Date(form.due_at.value).toISOString(),
+              line_items: parseJsonInput(form.line_items.value, []),
+              metadata: parseJsonInput(form.metadata.value, {}),
+            };
+            const invoice = await fetchJSON("/billing/invoices", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.invoices.push(invoice);
+            renderInvoices(state.invoices);
+            showToast("Rechnung erstellt", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Rechnung konnte nicht erstellt werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("invoice-status-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const invoiceId = form.invoice_id.value;
+          const payload = { status: form.status.value.trim() };
+          try {
+            const invoice = await fetchJSON(`/billing/invoices/${invoiceId}/status`, {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.invoices = state.invoices.map((existing) =>
+              existing.id === invoice.id ? invoice : existing,
+            );
+            renderInvoices(state.invoices);
+            showToast("Rechnungsstatus aktualisiert", "success");
+          } catch (error) {
+            showToast(`Statuswechsel fehlgeschlagen: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("proposal-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          try {
+            const components = parseJsonInput(form.components.value, []);
+            const payload = {
+              client_id: Number(form.client_id.value),
+              title: form.title.value.trim(),
+              summary: form.summary.value.trim() || null,
+              components,
+              currency: form.currency.value.trim() || "EUR",
+              margin_percent: Number(form.margin_percent.value || 0) / 100,
+              valid_days: Number(form.valid_days.value || 30),
+              include_subscription: form.include_subscription.checked,
+            };
+            const proposal = await fetchJSON("/billing/proposals/generate", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            state.proposals.push(proposal);
+            renderProposals(state.proposals);
+            showToast("Angebot generiert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Angebot konnte nicht erstellt werden: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("seo-analyse-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const url = form.url.value.trim();
+          if (!url) {
+            showToast("Bitte eine URL angeben", "error");
+            return;
+          }
+          const params = new URLSearchParams({ url });
+          try {
+            const report = await fetchJSON(`/seo/analyse?${params.toString()}`, { method: "POST" });
+            renderSeoReport(report);
+            showToast("Analyse abgeschlossen", "success");
+          } catch (error) {
+            showToast(`Analyse fehlgeschlagen: ${error.message}`, "error");
+          }
+        });
+
+        document.getElementById("metadata-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const payload = {
+            title: form.title.value.trim() || undefined,
+            description: form.description.value.trim() || undefined,
+            keywords: collectKeywords(form.keywords.value) || undefined,
+            og_image: form.og_image.value.trim() || undefined,
+          };
+          Object.keys(payload).forEach((key) => {
+            if (payload[key] === undefined) {
+              delete payload[key];
+            }
+          });
+          try {
+            await fetchJSON("/seo/metadata", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            showToast("Metadaten gespeichert", "success");
+            form.reset();
+          } catch (error) {
+            showToast(`Metadaten konnten nicht gespeichert werden: ${error.message}`, "error");
+          }
+        });
+
+        const disconnect = connectOsintStream();
+        loadAnalytics();
+        loadOsint();
+        loadContent();
+        loadClients();
+        loadBilling();
+
+        const autoRefresh = window.setInterval(loadAnalytics, 60000);
+        window.addEventListener("beforeunload", () => {
+          window.clearInterval(autoRefresh);
+          if (disconnect) {
+            disconnect();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
